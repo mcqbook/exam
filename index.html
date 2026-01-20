@@ -19,10 +19,9 @@
             --color-success: #00b894;
         }
 
-        /* ==================== BASE STYLES & SECURITY CSS ==================== */
+        /* ==================== BASE STYLES ==================== */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
-        /* 🔒 SECURITY: PREVENT TEXT SELECTION */
         body { 
             margin: 0; padding: 0; 
             background: #dfe6e9; 
@@ -31,13 +30,10 @@
             height: 100vh; height: 100dvh;
             display: flex; justify-content: center;
             overflow: hidden;
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none; /* IE 10 and IE 11 */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none; user-select: none;
         }
 
-        /* Allow selection only in input fields */
-        input, textarea { -webkit-user-select: text; user-select: text; }
+        input, textarea, select { -webkit-user-select: text; user-select: text; }
 
         .container { 
             width: 100%; max-width: 550px; 
@@ -54,33 +50,49 @@
         .font-num { font-family: var(--font-num); }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
 
-        /* ==================== BUTTONS (GLOBAL) ==================== */
+        /* ==================== BUTTONS & CHIPS ==================== */
         .btn { 
-            width: 100%; padding: 12px; border: none; border-radius: 10px; 
+            width: 100%; padding: 12px; border: none; border-radius: 8px; 
             font-weight: 600; cursor: pointer; margin-top: 10px; 
-            font-size: 1rem; transition: transform 0.1s; 
+            font-size: 0.95rem; transition: transform 0.1s; 
             font-family: var(--font-main); 
             display: flex; justify-content: center; align-items: center;
         }
         .btn:active { transform: scale(0.97); }
-        .btn-primary { background: var(--primary-gradient); color: white; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
+        .btn-primary { background: var(--primary-gradient); color: white; box-shadow: 0 3px 8px rgba(108, 92, 231, 0.3); }
         .btn-danger { background: #ff7675; color: white; }
         .btn-outline { background: white; border: 1.5px solid #dfe6e9; color: #636e72; }
         .btn-save { background: linear-gradient(135deg, #0984e3, #6c5ce7); color: white; box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3); border:none; }
+
+        /* Category Chips */
+        .cat-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .cat-chip {
+            padding: 5px 12px; background: white; border: 1px solid #dfe6e9;
+            border-radius: 20px; white-space: nowrap; font-size: 0.8rem;
+            color: #636e72; cursor: pointer; transition: 0.2s;
+        }
+        .cat-chip.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+
+        /* Pagination Controls */
+        .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        .page-btn { padding: 8px 15px; background: white; border: 1px solid #dfe6e9; border-radius: 8px; cursor: pointer; font-size: 0.8rem; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .page-info { font-size: 0.8rem; color: #636e72; }
 
         /* ==================== EXAM VIEW CSS ==================== */
         .exam-layout { display: flex; flex-direction: column; height: 100%; }
         
         .exam-header { 
-            background: white; padding: 12px 15px; 
+            background: white; padding: 10px 15px; 
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 1px solid #f1f2f6; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            z-index: 20; height: 60px;
+            z-index: 20; height: 50px;
         }
         
         .timer-badge { 
-            background: #d63031; color: white; padding: 5px 12px; 
-            border-radius: 20px; font-weight: bold; font-family: var(--font-num); font-size: 0.9rem;
+            background: #d63031; color: white; padding: 4px 10px; 
+            border-radius: 20px; font-weight: bold; font-family: var(--font-num); font-size: 0.85rem;
         }
 
         .scroll-area { 
@@ -89,36 +101,32 @@
         }
 
         .question-card { margin-bottom: 20px; }
-        #q-text { font-size: 1.1rem; line-height: 1.6; color: #2d3436; margin: 0 0 15px 0; font-weight: 600; }
+        #q-text { font-size: 1.05rem; line-height: 1.5; color: #2d3436; margin: 0 0 12px 0; font-weight: 600; }
         
         .option-btn { 
             background: white; border: 1.5px solid #e0e0e0; 
-            padding: 14px; border-radius: 12px; margin-bottom: 10px; 
+            padding: 12px; border-radius: 10px; margin-bottom: 8px; 
             cursor: pointer; width: 100%; text-align: left; 
-            transition: 0.2s; font-size: 1rem; color: #555;
+            transition: 0.2s; font-size: 0.95rem; color: #555;
             position: relative;
         }
-        .option-btn.selected { 
-            background: #eef2ff; border-color: #6c5ce7; 
-            color: #6c5ce7; font-weight: 600;
-        }
+        .option-btn.selected { background: #eef2ff; border-color: #6c5ce7; color: #6c5ce7; font-weight: 600; }
 
-        /* Footer */
+        /* Footer Bar (Exam) */
         .footer-bar { 
-            padding: 10px; 
-            padding-bottom: calc(10px + env(safe-area-inset-bottom)); 
-            background: white; 
-            border-top: 1px solid #f1f2f6; 
-            display: flex; gap: 8px; 
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05); 
-            z-index: 30;
+            padding: 8px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); 
+            background: white; border-top: 1px solid #f1f2f6; 
+            display: flex; gap: 8px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 30;
         }
-        .footer-btn {
-            flex: 1; padding: 10px 2px; margin: 0; 
-            font-size: 0.8rem; border-radius: 8px; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .footer-btn { flex: 1; padding: 8px 2px; margin: 0; font-size: 0.8rem; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .btn-save { flex: 1.2; }
+
+        /* App Footer (Dashboard) */
+        .app-footer {
+            text-align: center; padding: 20px; color: #b2bec3; 
+            font-size: 0.75rem; border-top: 1px solid #f1f2f6;
+            margin-top: auto; background: #fdfdfd;
+        }
 
         /* ==================== SIDE PANEL ==================== */
         .side-panel { 
@@ -133,46 +141,45 @@
         
         .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px; overflow-y: auto; }
         .palette-btn { 
-            height: 40px; border-radius: 8px; border: 1px solid #eee; background: #f9f9f9; 
+            height: 35px; border-radius: 6px; border: 1px solid #eee; background: #f9f9f9; 
             display: flex; justify-content: center; align-items: center; 
-            font-weight: 600; cursor: pointer; font-family: var(--font-num); color: #636e72;
+            font-weight: 600; cursor: pointer; font-family: var(--font-num); color: #636e72; font-size: 0.9rem;
         }
         .palette-btn.active { border: 1.5px solid #6c5ce7; background: white; color: #6c5ce7; } 
         .palette-btn.answered { background: #00b894; color: white; border: none; }
         .palette-btn.review { background: #a29bfe; color: white; border: none; }
 
+        /* Legend Style */
+        .legend-box {
+            padding: 10px 15px; background: #f8f9fa; border-top: 1px solid #eee;
+            font-size: 0.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; color: #636e72; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
         /* ==================== POPUP ==================== */
         .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
         .popup-box { 
-            background: white; padding: 25px; border-radius: 16px; 
-            width: 85%; max-width: 320px; text-align: center; 
+            background: white; padding: 20px; border-radius: 12px; 
+            width: 85%; max-width: 300px; text-align: center; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.3); animation: popIn 0.3s; 
         }
         @keyframes popIn { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
-        /* Result & Tables */
-        .result-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .result-table td, .result-table th { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-        
-        /* Stats */
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .stat-item { background: #f4f6f8; padding: 10px; border-radius: 8px; font-size: 0.8rem; border: 1px solid #eee; }
+        /* Stats & Results */
+        .result-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .result-table td, .result-table th { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .stat-item { background: #f4f6f8; padding: 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid #eee; }
 
     </style>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <script>
-        // Disable Right Click
         document.addEventListener('contextmenu', event => event.preventDefault());
-
-        // Disable Key Shortcuts (F12, Ctrl+U, Ctrl+Shift+I)
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) { return false; } // F12
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } // Ctrl+Shift+I
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; } // Ctrl+Shift+C
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; } // Ctrl+Shift+J
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } // Ctrl+U
-            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) { return false; } // Ctrl+S
+            if(e.keyCode == 123) return false; 
+            if(e.ctrlKey && (e.keyCode == 'U'.charCodeAt(0) || e.keyCode == 'S'.charCodeAt(0))) return false;
         }
     </script>
 </head>
@@ -184,12 +191,12 @@
 
     <div id="custom-popup" class="popup-overlay hidden">
         <div class="popup-box">
-            <div style="font-size: 3rem; margin-bottom: 5px;" id="pop-icon">⚠️</div>
-            <h3 id="pop-title" style="margin: 5px 0; color:#2d3436;">Alert</h3>
-            <p id="pop-msg" style="color: #636e72; margin-bottom: 20px; font-size: 0.95rem;">Message</p>
+            <div style="font-size: 2.5rem; margin-bottom: 5px;" id="pop-icon">⚠️</div>
+            <h3 id="pop-title" style="margin: 5px 0; color:#2d3436; font-size:1.1rem;">Alert</h3>
+            <p id="pop-msg" style="color: #636e72; margin-bottom: 15px; font-size: 0.9rem;">Message</p>
             <div style="display:flex; gap:10px;">
-                <button id="btn-pop-cancel" class="btn btn-outline" style="margin:0; flex:1;">Cancel</button>
-                <button id="btn-pop-ok" class="btn btn-primary" style="margin:0; flex:1;">OK</button>
+                <button id="btn-pop-cancel" class="btn btn-outline" style="margin:0; flex:1; padding:8px;">Cancel</button>
+                <button id="btn-pop-ok" class="btn btn-primary" style="margin:0; flex:1; padding:8px;">OK</button>
             </div>
         </div>
     </div>
@@ -203,27 +210,53 @@
         <div style="flex:1; overflow-y:auto;">
             <div id="palette-grid" class="palette-grid"></div>
         </div>
+        
+        <div class="legend-box">
+            <div class="legend-item"><span class="dot" style="background:#f9f9f9; border:1px solid #ddd;"></span> বাকি (Not Visited)</div>
+            <div class="legend-item"><span class="dot" style="background:white; border:1.5px solid #6c5ce7;"></span> বর্তমান (Current)</div>
+            <div class="legend-item"><span class="dot" style="background:#00b894;"></span> উত্তর দেওয়া</div>
+            <div class="legend-item"><span class="dot" style="background:#a29bfe;"></span> রিভিউ (Marked)</div>
+        </div>
+
         <div style="padding:15px; border-top:1px solid #eee; background:white;">
             <button onclick="confirmSubmit()" class="btn btn-danger" style="margin:0;">🚀 সাবমিট করুন</button>
         </div>
     </div>
 
-    <div id="view-dashboard" style="overflow-y:auto; height:100%;">
-        <div style="background:var(--primary-gradient); color:white; padding:40px 20px; text-align:center; border-radius:0 0 30px 30px;">
-            <h2 style="font-family: var(--font-num); margin:0;">Mr. Stylo Academy</h2>
-            <p style="margin:5px 0; opacity:0.9;">Premium Mock Test Platform</p>
+    <div id="view-dashboard" style="display:flex; flex-direction:column; height:100%;">
+        <div style="background:var(--primary-gradient); color:white; padding:20px 15px; text-align:center; border-radius:0 0 20px 20px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);">
+            <h3 style="font-family: var(--font-num); margin:0; font-size:1.3rem;">Mr. Stylo Academy</h3>
+            <p style="margin:2px 0; opacity:0.9; font-size:0.8rem;">Premium Mock Test Platform</p>
         </div>
-        <div class="p-20">
+        
+        <div class="p-20" style="flex:1; overflow-y:auto;">
+            <div class="cat-scroll" id="home-cat-container">
+                <div class="cat-chip active">All</div>
+                </div>
+
             <div id="exam-list">
                 <div style="text-align:center; padding:50px; color:#b2bec3;">লোড হচ্ছে...</div>
             </div>
-            <button onclick="switchView('admin-login')" class="btn btn-outline" style="margin-top:20px; border-style:dashed; color:#636e72;">👨‍🏫 শিক্ষক লগইন</button>
+
+            <div id="pagination-controls" class="pagination-bar hidden">
+                <button onclick="changePage(-1)" id="btn-prev" class="page-btn">Previous</button>
+                <span id="page-info" class="page-info font-num">Page 1</span>
+                <button onclick="changePage(1)" id="btn-next" class="page-btn">Next</button>
+            </div>
+            
+            <button onclick="switchView('admin-login')" class="btn btn-outline" style="margin-top:20px; border-style:dashed; color:#636e72; font-size:0.8rem;">👨‍🏫 শিক্ষক লগইন</button>
+        </div>
+
+        <div class="app-footer">
+            <p style="margin:0;">&copy; 2026 Mr. Stylo Academy</p>
+            <p style="margin:2px 0; font-size:0.7rem;">Designed for Excellence</p>
         </div>
     </div>
 
     <div id="view-intro" class="hidden p-20" style="overflow-y:auto; height:100%;">
         <div style="text-align:center; margin:20px 0;">
-            <h2 id="intro-title" style="color:var(--color-primary); margin:0;">Exam Name</h2>
+            <span id="intro-cat-badge" style="background:#dfe6e9; padding:4px 10px; border-radius:15px; font-size:0.8rem; color:#636e72;">Category</span>
+            <h2 id="intro-title" style="color:var(--color-primary); margin:5px 0 0 0; font-size:1.4rem;">Exam Name</h2>
         </div>
         <div style="background:white; border-radius:12px; padding:20px; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-bottom:20px; border:1px solid #f1f2f6;">
             <div class="stat-grid" style="margin-top:0;">
@@ -247,7 +280,7 @@
         </div>
         
         <div class="scroll-area">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.75rem; color:#636e72;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.75rem; color:#636e72;">
                 <span id="q-topic-badge" style="background:#e1e2e6; padding:3px 10px; border-radius:15px; font-weight:bold;">General</span>
                 <span class="font-num">Marks: +<span id="q-pos">1</span> / -<span id="q-neg">0.25</span></span>
             </div>
@@ -268,12 +301,12 @@
     </div>
 
     <div id="view-result" class="hidden p-20" style="overflow-y:auto; height:100%;">
-        <div style="background:white; border-radius:16px; padding:25px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-bottom:20px;">
+        <div style="background:white; border-radius:16px; padding:20px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-bottom:20px;">
             <h3 id="res-name" style="margin:0; color:#636e72;">Student</h3>
-            <div style="width:100px; height:100px; border-radius:50%; border:5px solid #f1f2f6; margin:15px auto; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                <span id="res-score" class="font-num" style="font-size:2rem; font-weight:bold; line-height:1; color:#2d3436;">0</span>
+            <div style="width:80px; height:80px; border-radius:50%; border:4px solid #f1f2f6; margin:10px auto; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                <span id="res-score" class="font-num" style="font-size:1.8rem; font-weight:bold; line-height:1; color:#2d3436;">0</span>
             </div>
-            <div id="res-grade" style="font-weight:bold; color:var(--color-primary); font-size:1.2rem;">Grade</div>
+            <div id="res-grade" style="font-weight:bold; color:var(--color-primary); font-size:1.1rem;">Grade</div>
             
             <div class="stat-grid">
                 <div class="stat-item">⏱️ <b id="res-time" class="font-num">0m</b></div>
@@ -307,16 +340,33 @@
         <h2 style="text-align:center;">👨‍🏫 ড্যাশবোর্ড</h2>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <button onclick="switchView('create-exam')" class="btn btn-primary" style="height:100px;">📝<br>নতুন পরীক্ষা</button>
-            <button onclick="loadAdminResults()" class="btn btn-primary" style="height:100px; background:#fab1a0; color:#333;">📊<br>রেজাল্ট</button>
+            <button onclick="loadCategoriesAdmin()" class="btn btn-primary" style="height:100px; background:#a29bfe; color:#333;">🗂️<br>ক্যাটাগরি</button>
+            <button onclick="loadAdminResults()" class="btn btn-primary" style="background:#fab1a0; color:#333;">📊 রেজাল্ট</button>
+            <button onclick="loadManageExams()" class="btn btn-danger">🗑️ ম্যানেজ</button>
             <button onclick="switchView('settings')" class="btn btn-outline">⚙️ পাসওয়ার্ড</button>
-            <button onclick="loadManageExams()" class="btn btn-danger">🗑️ ডিলিট</button>
         </div>
         <button onclick="switchView('dashboard')" class="btn btn-outline" style="margin-top:20px;">Logout</button>
+    </div>
+
+    <div id="view-categories" class="hidden p-20" style="overflow-y:auto; height:100%;">
+        <h3>🗂️ ক্যাটাগরি ম্যানেজ</h3>
+        <div style="display:flex; gap:5px; margin-bottom:15px;">
+            <input type="text" id="new-cat-name" placeholder="New Category Name..." style="padding:10px; flex:1; border:1px solid #ddd; border-radius:8px;">
+            <button onclick="addCategory()" class="btn btn-success" style="width:auto; margin:0;">Add</button>
+        </div>
+        <div id="admin-cat-list"></div>
+        <button onclick="switchView('admin-menu')" class="btn btn-danger" style="margin-top:20px;">Back</button>
     </div>
 
     <div id="view-create-exam" class="hidden p-20" style="overflow-y:auto; height:100%;">
         <h3>📝 প্রশ্ন তৈরি</h3>
         <input type="text" id="new-title" placeholder="Exam Name" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+        
+        <label style="font-size:0.8rem; color:#666; margin-left:5px;">Category:</label>
+        <select id="new-category" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:10px; background:white;">
+            <option value="General">General</option>
+            </select>
+
         <div style="display:flex; gap:5px; margin-bottom:10px;">
             <input type="number" id="new-time" placeholder="Time (m)" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px;">
             <input type="number" id="mark-correct" value="1" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px;">
@@ -339,7 +389,7 @@
         </div>
     </div>
 
-    <div id="view-manage-exams" class="hidden p-20" style="overflow-y:auto; height:100%;"><h3 style="text-align:center;">Delete Exams</h3><div id="manage-exam-list"></div><button onclick="switchView('admin-menu')" class="btn btn-outline">Back</button></div>
+    <div id="view-manage-exams" class="hidden p-20" style="overflow-y:auto; height:100%;"><h3 style="text-align:center;">Manage Exams</h3><div id="manage-exam-list"></div><button onclick="switchView('admin-menu')" class="btn btn-outline">Back</button></div>
     <div id="view-admin-results" class="hidden p-20" style="overflow-y:auto; height:100%;"><h3 style="text-align:center;">Results</h3><table class="result-table"><tbody id="result-table-body"></tbody></table><button onclick="switchView('admin-menu')" class="btn btn-danger" style="margin-top:20px;">Back</button></div>
     <div id="view-leaderboard" class="hidden p-20" style="overflow-y:auto; height:100%;"><h3 style="text-align:center;">Leaderboard</h3><p id="lb-exam-name" style="text-align:center; color:#666;"></p><div id="lb-list"></div><button onclick="switchView('result')" class="btn btn-primary" style="margin-top:20px;">Back</button></div>
     
@@ -383,7 +433,12 @@
 
     let activeExam=null, currentIdx=0, userAnswers=[], reviews=[], timerInterval, studentName="", inputMode='json';
     let appSettings={teacherPass:"1234", reviewPass:"5678"};
-    let examsData=[], cheatCount=0, remainingSeconds=0;
+    let allExamsData=[], categoryList=[], cheatCount=0, remainingSeconds=0, editingExamId = null;
+    
+    // Pagination Vars
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let currentFilteredExams = [];
 
     async function initApp() {
         try {
@@ -392,6 +447,7 @@
             if (docSnap.exists()) appSettings = docSnap.data();
             else await setDoc(docRef, appSettings);
         } catch(e){}
+        loadCategoriesPublic();
         loadExams();
     }
     initApp();
@@ -414,6 +470,7 @@
     };
 
     window.switchView = (v) => { 
+        if(v === 'create-exam' && !editingExamId) resetCreateForm();
         document.querySelectorAll('.container > div').forEach(d => { 
             if(!d.id.includes('popup') && !d.id.includes('side')) d.classList.add('hidden'); 
             if(d.id === 'view-exam') d.classList.remove('exam-layout');
@@ -423,34 +480,170 @@
         if(v === 'exam') t.classList.add('exam-layout');
     };
 
+    function resetCreateForm() {
+        editingExamId = null;
+        document.getElementById('new-title').value = "";
+        document.getElementById('new-time').value = "";
+        const sel = document.getElementById('new-category');
+        if(sel.options.length > 0) sel.selectedIndex = 0;
+        
+        document.getElementById('mark-correct').value = "1";
+        document.getElementById('mark-wrong').value = "0.25";
+        document.getElementById('json-input').value = "";
+        document.getElementById('questions-wrapper').innerHTML = "";
+        document.getElementById('btn-publish').innerText = "🚀 PUBLISH";
+        document.getElementById('btn-publish').classList.remove('btn-save');
+        document.getElementById('btn-publish').classList.add('btn-success');
+    }
+
     window.togglePanel = (open) => {
         const p = document.getElementById('side-panel'), o = document.getElementById('side-overlay');
         if(open){ p.classList.add('open'); o.classList.add('active'); updatePalette(); }
         else{ p.classList.remove('open'); o.classList.remove('active'); }
     };
 
+    // ================= CATEGORY & PAGINATION LOGIC =================
+
+    async function loadCategoriesPublic() {
+        categoryList = [];
+        try {
+            const s = await getDocs(query(collection(db, "categories"), orderBy("createdAt", "asc")));
+            if(s.empty) categoryList = [{name: "General", id: "default"}];
+            else s.forEach(d => categoryList.push({...d.data(), id: d.id}));
+            renderCategories();
+        } catch(e) { console.log("Cat error", e); }
+    }
+
+    function renderCategories() {
+        const homeCont = document.getElementById('home-cat-container');
+        let chipHtml = `<div onclick="filterExams('All')" class="cat-chip active" id="cat-all">All</div>`;
+        const dropCont = document.getElementById('new-category');
+        let dropHtml = ``;
+
+        categoryList.forEach(c => {
+            chipHtml += `<div onclick="filterExams('${c.name}')" class="cat-chip" id="cat-${c.name}">${c.name}</div>`;
+            dropHtml += `<option value="${c.name}">${c.name}</option>`;
+        });
+        homeCont.innerHTML = chipHtml;
+        dropCont.innerHTML = dropHtml;
+    }
+
+    window.loadCategoriesAdmin = async () => {
+        window.switchView('categories');
+        const listDiv = document.getElementById('admin-cat-list');
+        listDiv.innerHTML = "Loading...";
+        try {
+            const s = await getDocs(query(collection(db, "categories"), orderBy("createdAt", "asc")));
+            let h = "";
+            s.forEach(d => {
+                const c = d.data();
+                h += `<div style="background:white; padding:10px; border-radius:8px; border:1px solid #eee; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span><b>${c.name}</b></span>
+                    <button onclick="delCategory('${d.id}')" class="btn btn-danger" style="width:auto; padding:5px 12px; margin:0; font-size:0.8rem;">Delete</button>
+                </div>`;
+            });
+            listDiv.innerHTML = h || "<p style='text-align:center;'>No categories found.</p>";
+        } catch(e) { listDiv.innerHTML = "Error loading."; }
+    };
+
+    window.addCategory = async () => {
+        const name = document.getElementById('new-cat-name').value.trim();
+        if(!name) return showPopup("Error", "Enter Name!", "⚠️");
+        try {
+            await addDoc(collection(db, "categories"), { name: name, createdAt: Timestamp.now() });
+            document.getElementById('new-cat-name').value = "";
+            loadCategoriesAdmin(); loadCategoriesPublic(); 
+        } catch(e) { showPopup("Error", "Failed to add!", "❌"); }
+    };
+
+    window.delCategory = (id) => {
+        showPopup("Confirm", "Delete this category?", "🗑️", async () => {
+            await deleteDoc(doc(db, "categories", id));
+            loadCategoriesAdmin(); loadCategoriesPublic();
+        });
+    };
+
+    // ================= EXAM LIST & PAGINATION =================
+
     window.loadExams = async () => { 
-        const l = document.getElementById('exam-list'); l.innerHTML = "<div style='text-align:center;'>⏳ লোড হচ্ছে...</div>"; examsData=[]; 
+        const l = document.getElementById('exam-list'); l.innerHTML = "<div style='text-align:center;'>⏳ লোড হচ্ছে...</div>"; allExamsData=[]; 
         try{ 
             const s=await getDocs(query(collection(db,"exams"),orderBy("createdAt","desc"))); 
-            l.innerHTML=s.empty?"<p style='text-align:center;'>কোনো পরীক্ষা নেই</p>":""; 
-            let i=0; s.forEach(d=>{ 
-                examsData.push(d.data()); 
-                l.innerHTML+=`<div style="background:white; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee;">
-                    <div><h3 style="margin:0;">${d.data().title}</h3><p style="margin:5px 0; color:#666; font-size:0.85rem;">⏱️ ${d.data().duration}m | ${d.data().questions.length}Q</p></div>
-                    <button onclick="showIntro(${i})" class="btn btn-primary" style="width:auto; padding:8px 20px; margin:0;">Start</button>
-                </div>`; 
-                i++;
-            }); 
+            s.forEach(d=>{ allExamsData.push({...d.data(), id:d.id}); });
+            filterExams('All');
         }catch(e){l.innerHTML="Error loading exams.";} 
     };
 
+    window.filterExams = (cat) => {
+        document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+        let activeChip = document.getElementById('cat-' + (cat === 'All' ? 'all' : cat));
+        if(activeChip) activeChip.classList.add('active');
+
+        // Filter Logic
+        if (cat === 'All') {
+            currentFilteredExams = allExamsData;
+        } else {
+            currentFilteredExams = allExamsData.filter(e => (e.category || 'General') === cat);
+        }
+        
+        // Reset to Page 1
+        currentPage = 1;
+        renderExamList();
+    }
+
+    window.renderExamList = () => {
+        const l = document.getElementById('exam-list');
+        const pControls = document.getElementById('pagination-controls');
+        
+        if (currentFilteredExams.length === 0) {
+            l.innerHTML = "<p style='text-align:center;'>কোনো পরীক্ষা নেই</p>"; 
+            pControls.classList.add('hidden');
+            return;
+        }
+
+        // Pagination Logic
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageItems = currentFilteredExams.slice(startIndex, endIndex);
+        const totalPages = Math.ceil(currentFilteredExams.length / itemsPerPage);
+
+        let html = "";
+        pageItems.forEach((exam) => {
+            let originalIndex = allExamsData.findIndex(e => e.id === exam.id);
+            html += `<div style="background:white; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee; box-shadow:0 2px 5px rgba(0,0,0,0.02);">
+                <div>
+                    <span style="font-size:0.7rem; background:#dfe6e9; padding:2px 8px; border-radius:10px; color:#636e72;">${exam.category || 'General'}</span>
+                    <h3 style="margin:5px 0 0 0; font-size:1.1rem;">${exam.title}</h3>
+                    <p style="margin:5px 0; color:#666; font-size:0.85rem;">⏱️ ${exam.duration}m | ${exam.questions.length}Q</p>
+                </div>
+                <button onclick="showIntro(${originalIndex})" class="btn btn-primary" style="width:auto; padding:8px 20px; margin:0;">Start</button>
+            </div>`; 
+        });
+        l.innerHTML = html;
+
+        // Update Controls
+        if (totalPages > 1) {
+            pControls.classList.remove('hidden');
+            document.getElementById('page-info').innerText = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('btn-prev').disabled = (currentPage === 1);
+            document.getElementById('btn-next').disabled = (currentPage === totalPages);
+        } else {
+            pControls.classList.add('hidden');
+        }
+    }
+
+    window.changePage = (dir) => {
+        currentPage += dir;
+        renderExamList();
+    }
+
     window.showIntro=(idx)=>{ 
-        activeExam=examsData[idx]; window.switchView('intro'); 
+        activeExam=allExamsData[idx]; window.switchView('intro'); 
         let pos=activeExam.marking?activeExam.marking.correct:1;
         document.getElementById('intro-title').innerText=activeExam.title; 
         document.getElementById('intro-time').innerText=activeExam.duration; 
         document.getElementById('intro-q').innerText=activeExam.questions.length; 
+        document.getElementById('intro-cat-badge').innerText=activeExam.category || "General";
         document.getElementById('intro-total-marks').innerText=activeExam.questions.length*pos;
         document.getElementById('intro-neg').innerText=activeExam.marking?activeExam.marking.wrong:0.25;
     };
@@ -460,10 +653,7 @@
         if(!studentName) return showPopup("Alert","নাম লিখুন!","✍️"); 
         
         toggleFullScreen(); enableProtect();
-        
-        // Shuffle Question
         activeExam.questions = activeExam.questions.sort(() => Math.random() - 0.5);
-
         userAnswers=new Array(activeExam.questions.length).fill(null); 
         reviews=new Array(activeExam.questions.length).fill(false);
         currentIdx=0; cheatCount=0;
@@ -504,24 +694,15 @@
     window.markAndNext=()=>{ reviews[currentIdx]=true; window.nextQ(); };
     window.clearResponse=()=>{ userAnswers[currentIdx]=null; reviews[currentIdx]=false; loadQuestion(); };
     window.saveAndNext=()=>{ if(userAnswers[currentIdx]) reviews[currentIdx]=false; window.nextQ(); };
-    
-    // Previous Question
-    window.prevQ=()=>{ 
-        if(currentIdx > 0){ currentIdx--; loadQuestion(); } 
-        else { showPopup("Info","এটি প্রথম প্রশ্ন!","ℹ️"); }
-    };
-    
+    window.prevQ=()=>{ if(currentIdx > 0){ currentIdx--; loadQuestion(); } else { showPopup("Info","এটি প্রথম প্রশ্ন!","ℹ️"); } };
     window.nextQ=()=>{ if(currentIdx<activeExam.questions.length-1){ currentIdx++; loadQuestion(); } else { showPopup("End","শেষ প্রশ্ন! সাবমিট করুন।","🏁", ()=>togglePanel(true)); } };
     window.confirmSubmit=()=>{ showPopup("Submit?","আপনি কি নিশ্চিত?","🚀", window.submitExam); };
 
     function handleCheat(){
         if(document.hidden){
             cheatCount++;
-            if(cheatCount >= 3) {
-                showPopup("Violation", "৩ বার ওয়ার্নিং শেষ! অটোমেটিক সাবমিট হচ্ছে।", "🚫", window.submitExam, true);
-            } else {
-                showPopup("Warning", `ট্যাব পরিবর্তন করবেন না! ওয়ার্নিং: ${cheatCount}/3`, "⚠️", null, true);
-            }
+            if(cheatCount >= 3) showPopup("Violation", "৩ বার ওয়ার্নিং শেষ! অটো সাবমিট।", "🚫", window.submitExam, true);
+            else showPopup("Warning", `ট্যাব পরিবর্তন করবেন না! ওয়ার্নিং: ${cheatCount}/3`, "⚠️", null, true);
         }
     }
 
@@ -540,14 +721,12 @@
         let totalSec=activeExam.duration*60; let taken=totalSec-remainingSeconds;
         let mm=Math.floor(taken/60), ss=taken%60;
         let percent=(score/(activeExam.questions.length*pos))*100;
-
         let th="";
         for(let t in topicStats){
             let p=(topicStats[t].correct/topicStats[t].total)*100;
             let c=p>=80?'#00b894':(p>=40?'#fdcb6e':'#d63031');
             th+=`<div style="margin-bottom:8px;"><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;"><span>${t}</span><span>${Math.round(p)}%</span></div><div style="width:100%; background:#f1f2f6; height:6px; border-radius:10px;"><div style="height:100%; border-radius:10px; width:${p}%; background:${c};"></div></div></div>`;
         }
-
         window.switchView('result'); 
         document.getElementById('res-score').innerText=score.toFixed(2); 
         document.getElementById('res-percent').innerText=percent.toFixed(1)+"%"; 
@@ -556,7 +735,6 @@
         document.getElementById('res-correct').innerText=correct;
         document.getElementById('res-wrong').innerText=wrong;
         document.getElementById('topic-analysis-container').innerHTML=th;
-
         try{ confetti({particleCount:150,spread:70,origin:{y:0.6}}); }catch(e){}
         try{ await addDoc(collection(db,"results"),{name:studentName, exam:activeExam.title, score:score.toFixed(2), percent:percent.toFixed(1), createdAt:Timestamp.now()}); }catch(e){}
     };
@@ -589,7 +767,10 @@
     function getOpt(id,n){ return `<div style="display:flex; gap:5px; margin-bottom:5px;"><input type="radio" name="ans-${id}" value="${n-1}"><input type="text" class="inp-opt" placeholder="Op ${n}" style="padding:8px;"></div>`; }
 
     document.getElementById('btn-publish').addEventListener('click', async()=>{
-        const t=document.getElementById('new-title').value; let q=[];
+        const t=document.getElementById('new-title').value; 
+        const cat = document.getElementById('new-category').value; 
+        let q=[];
+        
         if(inputMode==='json'){ try{ let j=JSON.parse(document.getElementById('json-input').value); q=Array.isArray(j)?j:(j.questions||[]); }catch(e){ return showPopup("Error","JSON Error","⚠️"); } }
         else {
             document.querySelectorAll('#questions-wrapper .exam-card').forEach(c=>{
@@ -600,9 +781,61 @@
             });
         }
         if(!t || q.length===0) return showPopup("Error","তথ্য দিন!","⚠️");
-        try{ await addDoc(collection(db,"exams"),{title:t, duration:document.getElementById('new-time').value, questions:q, marking:{correct:document.getElementById('mark-correct').value, wrong:document.getElementById('mark-wrong').value}, createdAt:Timestamp.now()}); showPopup("Success","Published!","✅",()=>window.switchView('admin-menu')); }catch(e){}
+        
+        const payload = {
+            title:t, duration:document.getElementById('new-time').value, category: cat, questions:q, 
+            marking:{ correct:document.getElementById('mark-correct').value, wrong:document.getElementById('mark-wrong').value }, 
+            createdAt:Timestamp.now()
+        };
+
+        try{ 
+            if(editingExamId) {
+                await setDoc(doc(db, "exams", editingExamId), payload);
+                showPopup("Success", "Updated!", "✅", () => { editingExamId = null; window.switchView('admin-menu'); });
+            } else {
+                await addDoc(collection(db, "exams"), payload); 
+                showPopup("Success", "Published!", "✅", () => window.switchView('admin-menu')); 
+            }
+        } catch(e) { showPopup("Error", "Failed!", "❌"); }
     });
 
+    window.editExam = async (id) => {
+        showPopup("Loading", "লোড হচ্ছে...", "⏳", null, true);
+        try {
+            const docSnap = await getDoc(doc(db, "exams", id));
+            if(docSnap.exists()){
+                const d = docSnap.data();
+                editingExamId = id;
+                document.getElementById('new-title').value = d.title;
+                document.getElementById('new-time').value = d.duration;
+                document.getElementById('new-category').value = d.category || 'General';
+                if(d.marking){ document.getElementById('mark-correct').value = d.marking.correct; document.getElementById('mark-wrong').value = d.marking.wrong; }
+                window.toggleInputMode('json');
+                document.getElementById('json-input').value = JSON.stringify(d.questions, null, 4);
+                const btn = document.getElementById('btn-publish');
+                btn.innerText = "🔄 UPDATE EXAM";
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-save');
+                document.getElementById('custom-popup').classList.add('hidden');
+                window.switchView('create-exam');
+            }
+        } catch(e) { showPopup("Error", "Load Error", "❌"); }
+    };
+
+    window.loadManageExams=async()=>{ 
+        window.switchView('manage-exams'); document.getElementById('manage-exam-list').innerHTML="Loading..."; 
+        const s=await getDocs(query(collection(db,"exams"),orderBy("createdAt","desc"))); 
+        let h=""; s.forEach(d=>{
+            h+=`<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; gap:10px;">
+                <span style="flex:1;">${d.data().title} <small style="color:#666">(${d.data().category||'Gen'})</small></span>
+                <button onclick="editExam('${d.id}')" class="btn btn-primary" style="width:auto; padding:5px 12px; margin:0; font-size:0.8rem;">Edit</button>
+                <button onclick="delExam('${d.id}')" class="btn btn-danger" style="width:auto; padding:5px 12px; margin:0; font-size:0.8rem;">Del</button>
+            </div>`;
+        }); 
+        document.getElementById('manage-exam-list').innerHTML=h||"No Exams"; 
+    };
+
+    window.delExam=(id)=>{ showPopup("Delete?","মুছবেন?","🗑️",async()=>{ await deleteDoc(doc(db,"exams",id)); loadManageExams(); }); };
     window.checkReviewPass=()=>{ if(document.getElementById('review-pass').value===appSettings.reviewPass) window.showReview(); else showPopup("Error","ভুল পাসওয়ার্ড!","❌"); };
     window.showReview=()=>{ 
         let h=""; document.getElementById('review-student-name').innerText=studentName; 
@@ -616,13 +849,8 @@
             </div>`; 
         }); document.getElementById('review-list').innerHTML=h; window.switchView('review'); 
     };
-    window.filterReview=(t)=>{ 
-        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active');
-        document.querySelectorAll('.review-item').forEach(i=>{ i.style.display=(t==='all'||i.classList.contains(t))?'block':'none'; }); 
-    };
+    window.filterReview=(t)=>{ document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); document.querySelectorAll('.review-item').forEach(i=>{ i.style.display=(t==='all'||i.classList.contains(t))?'block':'none'; }); };
     window.loadAdminResults=async()=>{ window.switchView('admin-results'); document.getElementById('result-table-body').innerHTML="Loading..."; const s=await getDocs(query(collection(db,"results"),orderBy("createdAt","desc"))); let h=""; s.forEach(d=>{let v=d.data(); h+=`<tr style="border-bottom:1px solid #eee;"><td>${v.name}</td><td>${v.exam}</td><td>${v.score}</td></tr>`;}); document.getElementById('result-table-body').innerHTML=h||"<tr><td>No Data</td></tr>"; };
-    window.loadManageExams=async()=>{ window.switchView('manage-exams'); document.getElementById('manage-exam-list').innerHTML="Loading..."; const s=await getDocs(query(collection(db,"exams"),orderBy("createdAt","desc"))); let h=""; s.forEach(d=>{h+=`<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${d.data().title}</span><button onclick="delExam('${d.id}')" class="btn btn-danger" style="width:auto; padding:5px 10px; margin:0;">Del</button></div>`;}); document.getElementById('manage-exam-list').innerHTML=h||"No Exams"; };
-    window.delExam=(id)=>{ showPopup("Delete?","মুছবেন?","🗑️",async()=>{ await deleteDoc(doc(db,"exams",id)); loadManageExams(); }); };
     window.loadLeaderboard=async()=>{ window.switchView('leaderboard'); document.getElementById('lb-exam-name').innerText=activeExam.title; document.getElementById('lb-list').innerHTML="Loading..."; const s=await getDocs(query(collection(db,"results"),orderBy("score","desc"))); let h="<table style='width:100%; font-size:0.9rem;'><tr><th>Rank</th><th>Name</th><th>Score</th></tr>", r=1; s.forEach(d=>{let v=d.data(); if(v.exam===activeExam.title){ h+=`<tr><td style="text-align:center;">${r}</td><td>${v.name}</td><td style="text-align:center; font-weight:bold;">${v.score}</td></tr>`; r++; } }); document.getElementById('lb-list').innerHTML=r>1?h+"</table>":"No Data"; };
     window.shareExam=()=>{ if(navigator.share) navigator.share({title:activeExam.title, text:`Scored ${document.getElementById('res-score').innerText} in ${activeExam.title}!`, url:window.location.href}); else alert("Copied!"); };
 
