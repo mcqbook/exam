@@ -7,6 +7,31 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- MathJax Support -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true,
+          processEnvironments: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          ignoreHtmlClass: 'tex-ignore'
+        },
+        startup: {
+          ready: () => {
+            MathJax.startup.defaultReady();
+            MathJax.texReset();
+            MathJax.typesetClear();
+            MathJax.typesetPromise();
+          }
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <style>
         /* ==================== THEME VARIABLES ==================== */
         :root {
@@ -145,9 +170,32 @@
             display: flex; justify-content: center; align-items: center; 
             font-weight: 600; cursor: pointer; font-family: var(--font-num); color: #636e72; font-size: 0.9rem;
         }
-        .palette-btn.active { border: 1.5px solid #6c5ce7; background: white; color: #6c5ce7; } 
-        .palette-btn.answered { background: #00b894; color: white; border: none; }
-        .palette-btn.review { background: #a29bfe; color: white; border: none; }
+        .palette-btn.active { 
+            border: 2px solid #6c5ce7 !important; 
+            background: white !important; 
+            color: #6c5ce7 !important; 
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        .palette-btn.answered { 
+            background: #00b894 !important; 
+            color: white !important; 
+            border: 1px solid #00b894 !important; 
+        }
+        .palette-btn.review { 
+            background: #a29bfe !important; 
+            color: white !important; 
+            border: 1px solid #a29bfe !important; 
+        }
+        .palette-btn.answered.active { 
+            border: 2px solid #6c5ce7 !important;
+            background: #00b894 !important;
+        }
+        .palette-btn.review.active { 
+            border: 2px solid #6c5ce7 !important;
+            background: #a29bfe !important;
+        }
 
         /* Legend Style */
         .legend-box {
@@ -171,6 +219,31 @@
         .result-table td, .result-table th { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         .stat-item { background: #f4f6f8; padding: 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid #eee; }
+
+        /* MathJax Styling */
+        .math-content {
+            font-family: 'Noto Serif Bengali', serif;
+            line-height: 1.5;
+        }
+
+        .mjx-chtml {
+            font-size: 1em !important;
+        }
+
+        .MJX-TEX {
+            font-size: 1em;
+        }
+
+        /* Review answer highlighting */
+        .correct-answer {
+            background-color: #d4edda !important;
+            border: 1px solid #c3e6cb !important;
+        }
+
+        .wrong-answer {
+            background-color: #f8d7da !important;
+            border: 1px solid #f5c6cb !important;
+        }
 
     </style>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -221,6 +294,34 @@
         <div style="padding:15px; border-top:1px solid #eee; background:white;">
             <button onclick="confirmSubmit()" class="btn btn-danger" style="margin:0;">🚀 সাবমিট করুন</button>
         </div>
+    </div>
+
+    <!-- ফার্স্ট টাইম সেটআপ ভিউ -->
+    <div id="view-first-setup" class="hidden p-20" style="display:flex; flex-direction:column; justify-content:center; height:100%;">
+        <div style="text-align:center; margin-bottom:30px;">
+            <h2 style="color:var(--color-primary);">🔒 সিস্টেম সেটআপ</h2>
+            <p style="color:#636e72;">প্রথমবারের মতো সিস্টেম কনফিগার করুন</p>
+        </div>
+        
+        <div style="background:#f8f9fa; padding:20px; border-radius:10px; margin-bottom:20px;">
+            <h4 style="margin-top:0;">এডমিন অ্যাকাউন্ট তৈরি করুন</h4>
+            <input type="text" id="setup-admin-id" placeholder="এডমিন ইউজারনেম" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+            <input type="password" id="setup-admin-pass" placeholder="এডমিন পাসওয়ার্ড (অন্তত ৬ অক্ষর)" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+            <input type="password" id="setup-admin-pass-confirm" placeholder="পাসওয়ার্ড নিশ্চিত করুন" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:15px;">
+            
+            <h4 style="margin-top:20px;">রিভিউ পাসওয়ার্ড</h4>
+            <input type="password" id="setup-review-pass" placeholder="রিভিউ পাসওয়ার্ড" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+            <input type="password" id="setup-review-pass-confirm" placeholder="রিভিউ পাসওয়ার্ড নিশ্চিত করুন" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px;">
+        </div>
+        
+        <div style="background:#fff3cd; border:1px solid #ffeaa7; padding:15px; border-radius:8px; margin-bottom:20px;">
+            <p style="margin:0; color:#856404; font-size:0.9rem;">
+                ⚠️ <strong>সতর্কতা:</strong> এই পাসওয়ার্ডগুলো সুরক্ষিতভাবে সংরক্ষণ করুন। ভুলে গেলে পুনরুদ্ধার করা যাবে না।
+            </p>
+        </div>
+        
+        <button onclick="completeFirstSetup()" class="btn btn-primary">সেটআপ সম্পন্ন করুন</button>
+        <button onclick="location.reload()" class="btn btn-outline" style="margin-top:10px;">বাতিল করুন</button>
     </div>
 
     <div id="view-dashboard" style="display:flex; flex-direction:column; height:100%;">
@@ -287,8 +388,8 @@
             
             <div class="question-card">
                 <img id="q-image" src="" style="max-width:100%; display:none; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
-                <h3 id="q-text">Loading...</h3>
-                <div id="options-container"></div>
+                <h3 id="q-text" class="math-content">Loading...</h3>
+                <div id="options-container" class="math-content"></div>
             </div>
         </div>
 
@@ -329,23 +430,129 @@
         </div>
     </div>
 
+    <!-- এডমিন লগইন ভিউ - নতুন সিকিওর সিস্টেম -->
     <div id="view-admin-login" class="hidden p-20" style="display:flex; flex-direction:column; justify-content:center; height:100%;">
-        <h2 style="text-align:center;">🔐 শিক্ষক লগইন</h2>
-        <input type="password" id="admin-pass" placeholder="Password" style="padding:12px; border:1px solid #ddd; border-radius:8px; width:100%;">
-        <button onclick="checkAdmin()" class="btn btn-primary">Login</button>
-        <button onclick="switchView('dashboard')" class="btn btn-danger">Back</button>
+        <h2 style="text-align:center;">🔐 সিকিওর এডমিন লগইন</h2>
+        
+        <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:20px;">
+            <input type="text" id="admin-id" placeholder="এডমিন ইউজারনেম" style="padding:12px; border:1px solid #ddd; border-radius:8px; width:100%; margin-bottom:10px;">
+            <input type="password" id="admin-pass" placeholder="পাসওয়ার্ড" style="padding:12px; border:1px solid #ddd; border-radius:8px; width:100%; margin-bottom:15px;">
+            
+            <div style="display:flex; gap:10px;">
+                <button onclick="checkAdmin()" class="btn btn-primary" style="flex:1;">লগইন</button>
+                <button onclick="switchView('dashboard')" class="btn btn-outline" style="flex:1;">ফিরে যান</button>
+            </div>
+        </div>
+        
+        <div style="text-align:center; font-size:0.8rem; color:#636e72;">
+            <p>⚠️ শুধুমাত্র অনুমোদিত এডমিনরা লগইন করতে পারবেন</p>
+        </div>
     </div>
 
     <div id="view-admin-menu" class="hidden p-20" style="overflow-y:auto; height:100%;">
-        <h2 style="text-align:center;">👨‍🏫 ড্যাশবোর্ড</h2>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="text-align:center; margin-bottom:20px;">
+            <h2>👨‍🏫 এডমিন ড্যাশবোর্ড</h2>
+            <p style="color:#636e72; font-size:0.9rem;">লগইনকৃত: <span id="logged-admin" style="font-weight:bold;"></span></p>
+        </div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
             <button onclick="switchView('create-exam')" class="btn btn-primary" style="height:100px;">📝<br>নতুন পরীক্ষা</button>
             <button onclick="loadCategoriesAdmin()" class="btn btn-primary" style="height:100px; background:#a29bfe; color:#333;">🗂️<br>ক্যাটাগরি</button>
             <button onclick="loadAdminResults()" class="btn btn-primary" style="background:#fab1a0; color:#333;">📊 রেজাল্ট</button>
             <button onclick="loadManageExams()" class="btn btn-danger">🗑️ ম্যানেজ</button>
-            <button onclick="switchView('settings')" class="btn btn-outline">⚙️ পাসওয়ার্ড</button>
+            <button onclick="switchView('admin-settings')" class="btn btn-outline">⚙️ সেটিংস</button>
+            <button onclick="switchView('change-password')" class="btn btn-outline">🔐 পাসওয়ার্ড পরিবর্তন</button>
         </div>
-        <button onclick="switchView('dashboard')" class="btn btn-outline" style="margin-top:20px;">Logout</button>
+        
+        <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:20px;">
+            <h4 style="margin-top:0;">সিস্টেম তথ্য</h4>
+            <div style="font-size:0.85rem; color:#636e72;">
+                <div>মোট পরীক্ষা: <span id="total-exams" class="font-num">0</span></div>
+                <div>মোট রেজাল্ট: <span id="total-results" class="font-num">0</span></div>
+                <div>সিস্টেম অবস্থা: <span style="color:#00b894;">সক্রিয়</span></div>
+            </div>
+        </div>
+        
+        <button onclick="adminLogout()" class="btn btn-danger" style="margin-top:10px;">লগআউট</button>
+    </div>
+
+    <!-- এডমিন সেটিংস - পাসওয়ার্ড ম্যানেজমেন্ট যোগ করা হয়েছে -->
+    <div id="view-admin-settings" class="hidden p-20" style="overflow-y:auto; height:100%;">
+        <h3>⚙️ এডমিন সেটিংস</h3>
+        
+        <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:15px;">
+            <h4 style="margin-top:0;">সিস্টেম কনফিগারেশন</h4>
+            
+            <div style="margin-bottom:10px;">
+                <label style="font-size:0.9rem; display:block; margin-bottom:5px;">সিস্টেম নাম:</label>
+                <input type="text" id="system-name" placeholder="সিস্টেম নাম" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px;">
+            </div>
+            
+            <div style="margin-bottom:10px;">
+                <label style="font-size:0.9rem; display:block; margin-bottom:5px;">ডিফল্ট পরীক্ষা সময় (মিনিট):</label>
+                <input type="number" id="default-exam-time" value="30" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px;">
+            </div>
+            
+            <div style="margin-bottom:10px;">
+                <label style="font-size:0.9rem; display:block; margin-bottom:5px;">ডিফল্ট পজিটিভ মার্ক:</label>
+                <input type="number" step="0.25" id="default-positive-mark" value="1" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px;">
+            </div>
+            
+            <div style="margin-bottom:10px;">
+                <label style="font-size:0.9rem; display:block; margin-bottom:5px;">ডিফল্ট নেগেটিভ মার্ক:</label>
+                <input type="number" step="0.25" id="default-negative-mark" value="0.25" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px;">
+            </div>
+        </div>
+        
+        <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:15px;">
+            <h4 style="margin-top:0;">পাসওয়ার্ড ম্যানেজমেন্ট</h4>
+            
+            <div style="margin-bottom:15px;">
+                <h5 style="margin:10px 0 5px 0; font-size:0.9rem;">এডমিন পাসওয়ার্ড পরিবর্তন</h5>
+                <input type="password" id="admin-new-password" placeholder="নতুন এডমিন পাসওয়ার্ড (অন্তত ৬ অক্ষর)" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:8px;">
+                <input type="password" id="admin-new-password-confirm" placeholder="পাসওয়ার্ড নিশ্চিত করুন" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+                <button onclick="changeAdminPasswordFromSettings()" class="btn btn-primary" style="width:100%; padding:8px; font-size:0.9rem;">এডমিন পাসওয়ার্ড পরিবর্তন</button>
+            </div>
+            
+            <div style="margin-bottom:15px; padding-top:15px; border-top:1px solid #eee;">
+                <h5 style="margin:10px 0 5px 0; font-size:0.9rem;">রিভিউ পাসওয়ার্ড পরিবর্তন</h5>
+                <input type="password" id="review-new-password" placeholder="নতুন রিভিউ পাসওয়ার্ড" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:8px;">
+                <input type="password" id="review-new-password-confirm" placeholder="পাসওয়ার্ড নিশ্চিত করুন" style="padding:10px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+                <button onclick="changeReviewPassword()" class="btn btn-primary" style="width:100%; padding:8px; font-size:0.9rem; background:#a29bfe; border:none;">রিভিউ পাসওয়ার্ড পরিবর্তন</button>
+            </div>
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+            <button onclick="saveSystemSettings()" class="btn btn-success" style="flex:1;">সেভ করুন</button>
+            <button onclick="switchView('admin-menu')" class="btn btn-danger" style="flex:1;">ফিরে যান</button>
+        </div>
+    </div>
+
+    <!-- পাসওয়ার্ড পরিবর্তন -->
+    <div id="view-change-password" class="hidden p-20" style="display:flex; flex-direction:column; justify-content:center; height:100%;">
+        <h3 style="text-align:center;">🔐 পাসওয়ার্ড পরিবর্তন</h3>
+        
+        <div style="background:#f8f9fa; padding:20px; border-radius:10px; margin-bottom:20px;">
+            <div style="margin-bottom:15px;">
+                <label style="font-size:0.9rem; display:block; margin-bottom:5px;">বর্তমান পাসওয়ার্ড:</label>
+                <input type="password" id="current-password" placeholder="বর্তমান পাসওয়ার্ড" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px;">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="font-size:0.9rem; display:block; margin-bottom:5px;">নতুন পাসওয়ার্ড:</label>
+                <input type="password" id="new-password" placeholder="নতুন পাসওয়ার্ড (অন্তত ৬ অক্ষর)" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px;">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="font-size:0.9rem; display:block; margin-bottom:5px;">নতুন পাসওয়ার্ড নিশ্চিত করুন:</label>
+                <input type="password" id="confirm-password" placeholder="পাসওয়ার্ড নিশ্চিত করুন" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px;">
+            </div>
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+            <button onclick="changeAdminPassword()" class="btn btn-primary" style="flex:1;">পাসওয়ার্ড পরিবর্তন</button>
+            <button onclick="switchView('admin-menu')" class="btn btn-outline" style="flex:1;">ফিরে যান</button>
+        </div>
     </div>
 
     <div id="view-categories" class="hidden p-20" style="overflow-y:auto; height:100%;">
@@ -390,14 +597,50 @@
     </div>
 
     <div id="view-manage-exams" class="hidden p-20" style="overflow-y:auto; height:100%;"><h3 style="text-align:center;">Manage Exams</h3><div id="manage-exam-list"></div><button onclick="switchView('admin-menu')" class="btn btn-outline">Back</button></div>
-    <div id="view-admin-results" class="hidden p-20" style="overflow-y:auto; height:100%;"><h3 style="text-align:center;">Results</h3><table class="result-table"><tbody id="result-table-body"></tbody></table><button onclick="switchView('admin-menu')" class="btn btn-danger" style="margin-top:20px;">Back</button></div>
+    
+    <!-- এডমিন রেজাল্ট পেজ - প্যাজিনেশন যোগ করা হয়েছে -->
+    <div id="view-admin-results" class="hidden p-20" style="overflow-y:auto; height:100%;">
+        <h3 style="text-align:center;">Results</h3>
+        <div id="result-table-container">
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Exam</th>
+                        <th>Score</th>
+                        <th>%</th>
+                        <th>Correct/Total</th>
+                    </tr>
+                </thead>
+                <tbody id="result-table-body"></tbody>
+            </table>
+        </div>
+        <div id="result-pagination" class="pagination-bar hidden" style="margin-top:15px;">
+            <button onclick="changeResultPage(-1)" id="btn-results-prev" class="page-btn">Previous</button>
+            <span id="results-page-info" class="page-info font-num">Page 1</span>
+            <button onclick="changeResultPage(1)" id="btn-results-next" class="page-btn">Next</button>
+        </div>
+        <button onclick="switchView('admin-menu')" class="btn btn-danger" style="margin-top:20px;">Back</button>
+    </div>
+    
     <div id="view-leaderboard" class="hidden p-20" style="overflow-y:auto; height:100%;"><h3 style="text-align:center;">Leaderboard</h3><p id="lb-exam-name" style="text-align:center; color:#666;"></p><div id="lb-list"></div><button onclick="switchView('result')" class="btn btn-primary" style="margin-top:20px;">Back</button></div>
     
+    <!-- রিভিউ লগইন - নতুন সিকিওর সিস্টেম -->
     <div id="view-review-login" class="hidden p-20" style="display:flex; flex-direction:column; justify-content:center; height:100%;">
-        <h2 style="text-align:center;">🔒 Review Access</h2>
-        <input type="password" id="review-pass" placeholder="Pass" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px;">
-        <button onclick="checkReviewPass()" class="btn btn-success">Submit</button>
-        <button onclick="switchView('result')" class="btn btn-danger">Back</button>
+        <h2 style="text-align:center;">🔒 উত্তরপত্র এক্সেস</h2>
+        
+        <div style="background:#f8f9fa; padding:20px; border-radius:10px; margin-bottom:20px;">
+            <input type="password" id="review-pass" placeholder="রিভিউ পাসওয়ার্ড দিন" style="padding:12px; width:100%; border:1px solid #ddd; border-radius:8px; margin-bottom:15px;">
+            
+            <div style="display:flex; gap:10px;">
+                <button onclick="checkReviewPass()" class="btn btn-primary" style="flex:1;">এন্টার</button>
+                <button onclick="switchView('result')" class="btn btn-outline" style="flex:1;">ফিরে যান</button>
+            </div>
+        </div>
+        
+        <div style="text-align:center; font-size:0.8rem; color:#636e72;">
+            <p>⚠️ শুধুমাত্র অনুমোদিত ব্যক্তিরা উত্তরপত্র দেখতে পারবেন</p>
+        </div>
     </div>
 
     <div id="view-review" class="hidden p-20" style="overflow-y:auto; height:100%;">
@@ -414,49 +657,203 @@
         <button onclick="switchView('result')" class="btn btn-primary">Back</button>
     </div>
 
-    <div id="view-settings" class="hidden p-20">
-        <h3>Change Password</h3>
-        <input type="text" id="new-teacher-pass" placeholder="Teacher Pass" style="padding:10px; width:100%; border:1px solid #ddd; margin-bottom:5px;">
-        <input type="text" id="new-review-pass" placeholder="Review Pass" style="padding:10px; width:100%; border:1px solid #ddd;">
-        <button onclick="saveSettings()" class="btn btn-success">Save</button>
-        <button onclick="switchView('admin-menu')" class="btn btn-danger">Back</button>
-    </div>
-
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query, Timestamp, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query, Timestamp, setDoc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyC5hrI06t9N-K4GAlLxGc6pjb0-JyNC9c8", authDomain: "myquizapp-7c5ac.firebaseapp.com", projectId: "myquizapp-7c5ac", storageBucket: "myquizapp-7c5ac.firebasestorage.app", messagingSenderId: "685862319630", appId: "1:685862319630:web:2997eda6844b3bf9d6ee5f" };
-    let app, db; try { app=initializeApp(firebaseConfig); db=getFirestore(app); } catch(e){}
+    const firebaseConfig = { 
+        apiKey: "AIzaSyC5hrI06t9N-K4GAlLxGc6pjb0-JyNC9c8", 
+        authDomain: "myquizapp-7c5ac.firebaseapp.com", 
+        projectId: "myquizapp-7c5ac", 
+        storageBucket: "myquizapp-7c5ac.firebasestorage.app", 
+        messagingSenderId: "685862319630", 
+        appId: "1:685862319630:web:2997eda6844b3bf9d6ee5f" 
+    };
+    
+    let app, db; 
+    try { 
+        app = initializeApp(firebaseConfig); 
+        db = getFirestore(app); 
+    } catch(e) {
+        console.error("Firebase initialization error:", e);
+        showPopup("Error", "Database connection failed!", "❌");
+    }
 
-    let activeExam=null, currentIdx=0, userAnswers=[], reviews=[], timerInterval, studentName="", inputMode='json';
-    let appSettings={teacherPass:"1234", reviewPass:"5678"};
-    let allExamsData=[], categoryList=[], cheatCount=0, remainingSeconds=0, editingExamId = null;
+    let activeExam = null, currentIdx = 0, userAnswers = [], reviews = [], timerInterval, studentName = "", inputMode = 'json';
+    
+    // এখানে কোন ডিফল্ট ক্রেডেনশিয়াল নেই
+    let appSettings = null;
+    let currentAdmin = null; // বর্তমান লগইনকৃত এডমিন
+    
+    let allExamsData = [], categoryList = [], cheatCount = 0, remainingSeconds = 0, editingExamId = null;
     
     // Pagination Vars
     let currentPage = 1;
     const itemsPerPage = 10;
     let currentFilteredExams = [];
 
+    // Results Pagination Vars
+    let allResultsData = [];
+    let currentResultsPage = 1;
+    const resultsPerPage = 20;
+
+    // Simple hash function (for basic security - not for production)
+    function simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash.toString(36);
+    }
+
+    // MathJax রেন্ডার ফাংশন
+    window.renderMathJax = function() {
+        if (window.MathJax && MathJax.typeset) {
+            setTimeout(() => {
+                MathJax.typesetPromise().catch(err => {
+                    console.log("MathJax render error:", err);
+                });
+            }, 50);
+        }
+    };
+
     async function initApp() {
         try {
-            const docRef = doc(db, "settings", "config");
+            console.log("Initializing app...");
+            
+            // Check if settings exist
+            const docRef = doc(db, "settings", "system");
             const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) appSettings = docSnap.data();
-            else await setDoc(docRef, appSettings);
-        } catch(e){}
-        loadCategoriesPublic();
-        loadExams();
+            
+            if (docSnap.exists()) {
+                // System already configured
+                appSettings = docSnap.data();
+                console.log("System settings loaded:", appSettings);
+                
+                // Show dashboard
+                window.switchView('dashboard');
+                
+                // Load categories and exams
+                loadCategoriesPublic();
+                loadExams();
+                
+                // Load system stats
+                loadSystemStats();
+            } else {
+                // First time setup needed
+                console.log("System not configured, showing first setup");
+                window.switchView('first-setup');
+            }
+        } catch(e) {
+            console.error("Error initializing app:", e);
+            showPopup("Error", "সিস্টেম লোড করা যায়নি!", "❌");
+        }
     }
+    
+    // Load system statistics
+    async function loadSystemStats() {
+        try {
+            // Count exams
+            const examsSnapshot = await getDocs(collection(db, "exams"));
+            const examCount = examsSnapshot.size;
+            
+            // Count results
+            const resultsSnapshot = await getDocs(collection(db, "results"));
+            const resultCount = resultsSnapshot.size;
+            
+            // Update UI
+            document.getElementById('total-exams').textContent = examCount;
+            document.getElementById('total-results').textContent = resultCount;
+        } catch(e) {
+            console.error("Error loading stats:", e);
+        }
+    }
+    
+    // First time setup
+    window.completeFirstSetup = async () => {
+        const adminId = document.getElementById('setup-admin-id').value.trim();
+        const adminPass = document.getElementById('setup-admin-pass').value.trim();
+        const adminPassConfirm = document.getElementById('setup-admin-pass-confirm').value.trim();
+        const reviewPass = document.getElementById('setup-review-pass').value.trim();
+        const reviewPassConfirm = document.getElementById('setup-review-pass-confirm').value.trim();
+        
+        // Validation
+        if (!adminId || !adminPass || !reviewPass) {
+            showPopup("Error", "সব ফিল্ড পূরণ করুন!", "⚠️");
+            return;
+        }
+        
+        if (adminPass.length < 6) {
+            showPopup("Error", "এডমিন পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে!", "⚠️");
+            return;
+        }
+        
+        if (adminPass !== adminPassConfirm) {
+            showPopup("Error", "এডমিন পাসওয়ার্ড মিলছে না!", "⚠️");
+            return;
+        }
+        
+        if (reviewPass !== reviewPassConfirm) {
+            showPopup("Error", "রিভিউ পাসওয়ার্ড মিলছে না!", "⚠️");
+            return;
+        }
+        
+        try {
+            // Hash passwords
+            const hashedAdminPass = simpleHash(adminPass);
+            const hashedReviewPass = simpleHash(reviewPass);
+            
+            // Create settings document
+            const settingsData = {
+                adminId: adminId,
+                adminPass: hashedAdminPass,
+                reviewPass: hashedReviewPass,
+                systemName: "Mr. Stylo Academy",
+                defaultExamTime: 30,
+                defaultPositiveMark: 1,
+                defaultNegativeMark: 0.25,
+                createdAt: Timestamp.now(),
+                updatedAt: Timestamp.now()
+            };
+            
+            await setDoc(doc(db, "settings", "system"), settingsData);
+            
+            // Also create an admin log
+            await addDoc(collection(db, "admin_logs"), {
+                action: "SYSTEM_SETUP",
+                adminId: adminId,
+                timestamp: Timestamp.now(),
+                details: "System initialized for the first time"
+            });
+            
+            showPopup("Success", "সিস্টেম সফলভাবে কনফিগার হয়েছে!", "✅", () => {
+                location.reload(); // Reload to apply settings
+            });
+            
+        } catch(e) {
+            console.error("Setup error:", e);
+            showPopup("Error", "সেটআপ করা যায়নি!", "❌");
+        }
+    };
+    
     initApp();
 
-    window.toggleFullScreen = () => { if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{}); };
-    window.enableProtect = () => { window.onbeforeunload = function() { return "Exam running!"; }; };
-    window.disableProtect = () => { window.onbeforeunload = null; };
+    window.toggleFullScreen = () => { 
+        if(document.documentElement.requestFullscreen) 
+            document.documentElement.requestFullscreen().catch(()=>{}); 
+    };
+    window.enableProtect = () => { 
+        window.onbeforeunload = function() { return "Exam running!"; }; 
+    };
+    window.disableProtect = () => { 
+        window.onbeforeunload = null; 
+    };
 
-    window.showPopup = (t, m, i, ok, hideCancel=false) => {
+    window.showPopup = (t, m, i, ok, hideCancel = false) => {
         document.getElementById('pop-title').innerText = t; 
         document.getElementById('pop-msg').innerText = m; 
         document.getElementById('pop-icon').innerText = i;
@@ -465,8 +862,13 @@
         c.style.display = hideCancel ? 'none' : 'block';
         o.style.width = hideCancel ? '100%' : 'auto';
         document.getElementById('custom-popup').classList.remove('hidden');
-        o.onclick = () => { document.getElementById('custom-popup').classList.add('hidden'); if(ok) ok(); };
-        c.onclick = () => { document.getElementById('custom-popup').classList.add('hidden'); };
+        o.onclick = () => { 
+            document.getElementById('custom-popup').classList.add('hidden'); 
+            if(ok) ok(); 
+        };
+        c.onclick = () => { 
+            document.getElementById('custom-popup').classList.add('hidden'); 
+        };
     };
 
     window.switchView = (v) => { 
@@ -478,6 +880,11 @@
         let t = document.getElementById('view-' + v); 
         t.classList.remove('hidden');
         if(v === 'exam') t.classList.add('exam-layout');
+        
+        // Load settings when admin settings view is opened
+        if(v === 'admin-settings') {
+            loadSettingsToForm();
+        }
     };
 
     function resetCreateForm() {
@@ -550,28 +957,41 @@
         const name = document.getElementById('new-cat-name').value.trim();
         if(!name) return showPopup("Error", "Enter Name!", "⚠️");
         try {
-            await addDoc(collection(db, "categories"), { name: name, createdAt: Timestamp.now() });
+            await addDoc(collection(db, "categories"), { 
+                name: name, 
+                createdAt: Timestamp.now(),
+                createdBy: currentAdmin 
+            });
             document.getElementById('new-cat-name').value = "";
-            loadCategoriesAdmin(); loadCategoriesPublic(); 
+            loadCategoriesAdmin(); 
+            loadCategoriesPublic(); 
+            showPopup("Success", "Category added!", "✅");
         } catch(e) { showPopup("Error", "Failed to add!", "❌"); }
     };
 
     window.delCategory = (id) => {
         showPopup("Confirm", "Delete this category?", "🗑️", async () => {
             await deleteDoc(doc(db, "categories", id));
-            loadCategoriesAdmin(); loadCategoriesPublic();
+            loadCategoriesAdmin(); 
+            loadCategoriesPublic();
+            showPopup("Success", "Category deleted!", "✅");
         });
     };
 
     // ================= EXAM LIST & PAGINATION =================
 
     window.loadExams = async () => { 
-        const l = document.getElementById('exam-list'); l.innerHTML = "<div style='text-align:center;'>⏳ লোড হচ্ছে...</div>"; allExamsData=[]; 
+        const l = document.getElementById('exam-list'); 
+        l.innerHTML = "<div style='text-align:center;'>⏳ লোড হচ্ছে...</div>"; 
+        allExamsData = []; 
         try{ 
-            const s=await getDocs(query(collection(db,"exams"),orderBy("createdAt","desc"))); 
-            s.forEach(d=>{ allExamsData.push({...d.data(), id:d.id}); });
+            const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc"))); 
+            s.forEach(d => { allExamsData.push({...d.data(), id: d.id}); });
             filterExams('All');
-        }catch(e){l.innerHTML="Error loading exams.";} 
+        } catch(e) {
+            l.innerHTML = "Error loading exams.";
+            console.error("Error loading exams:", e);
+        } 
     };
 
     window.filterExams = (cat) => {
@@ -637,222 +1057,929 @@
         renderExamList();
     }
 
-    window.showIntro=(idx)=>{ 
-        activeExam=allExamsData[idx]; window.switchView('intro'); 
-        let pos=activeExam.marking?activeExam.marking.correct:1;
-        document.getElementById('intro-title').innerText=activeExam.title; 
-        document.getElementById('intro-time').innerText=activeExam.duration; 
-        document.getElementById('intro-q').innerText=activeExam.questions.length; 
-        document.getElementById('intro-cat-badge').innerText=activeExam.category || "General";
-        document.getElementById('intro-total-marks').innerText=activeExam.questions.length*pos;
-        document.getElementById('intro-neg').innerText=activeExam.marking?activeExam.marking.wrong:0.25;
+    window.showIntro = (idx) => { 
+        activeExam = allExamsData[idx]; 
+        window.switchView('intro'); 
+        let pos = activeExam.marking ? activeExam.marking.correct : 1;
+        document.getElementById('intro-title').innerText = activeExam.title; 
+        document.getElementById('intro-time').innerText = activeExam.duration; 
+        document.getElementById('intro-q').innerText = activeExam.questions.length; 
+        document.getElementById('intro-cat-badge').innerText = activeExam.category || "General";
+        document.getElementById('intro-total-marks').innerText = activeExam.questions.length * pos;
+        document.getElementById('intro-neg').innerText = activeExam.marking ? activeExam.marking.wrong : 0.25;
     };
 
-    window.startRealExam=()=>{ 
-        studentName=document.getElementById('student-name-input').value; 
-        if(!studentName) return showPopup("Alert","নাম লিখুন!","✍️"); 
+    window.startRealExam = () => { 
+        studentName = document.getElementById('student-name-input').value.trim(); 
+        if(!studentName) return showPopup("Alert", "নাম লিখুন!", "✍️"); 
         
-        toggleFullScreen(); enableProtect();
+        toggleFullScreen(); 
+        enableProtect();
         activeExam.questions = activeExam.questions.sort(() => Math.random() - 0.5);
-        userAnswers=new Array(activeExam.questions.length).fill(null); 
-        reviews=new Array(activeExam.questions.length).fill(false);
-        currentIdx=0; cheatCount=0;
-        document.getElementById('display-name').innerText=studentName; 
-        document.getElementById('q-pos').innerText=activeExam.marking?activeExam.marking.correct:1;
-        document.getElementById('q-neg').innerText=activeExam.marking?activeExam.marking.wrong:0.25;
-        window.switchView('exam'); generatePalette(); loadQuestion(); 
-        startTimer(activeExam.duration*60); 
+        userAnswers = new Array(activeExam.questions.length).fill(null); 
+        reviews = new Array(activeExam.questions.length).fill(false);
+        currentIdx = 0; 
+        cheatCount = 0;
+        document.getElementById('display-name').innerText = studentName; 
+        document.getElementById('q-pos').innerText = activeExam.marking ? activeExam.marking.correct : 1;
+        document.getElementById('q-neg').innerText = activeExam.marking ? activeExam.marking.wrong : 0.25;
+        window.switchView('exam'); 
+        generatePalette(); 
+        loadQuestion(); 
+        startTimer(activeExam.duration * 60); 
         document.addEventListener("visibilitychange", handleCheat); 
     };
 
-    function generatePalette(){
-        let html=""; for(let i=0; i<activeExam.questions.length; i++) html+=`<div onclick="jumpToQ(${i})" id="pal-${i}" class="palette-btn">${i+1}</div>`;
-        document.getElementById('palette-grid').innerHTML=html;
+    function generatePalette() {
+        let html = ""; 
+        for(let i = 0; i < activeExam.questions.length; i++) {
+            let classes = "palette-btn";
+            if(i === currentIdx) classes += " active";
+            if(userAnswers[i] !== null && userAnswers[i] !== undefined) classes += " answered";
+            if(reviews[i]) classes += " review";
+            html += `<div onclick="jumpToQ(${i})" id="pal-${i}" class="${classes}">${i+1}</div>`;
+        }
+        document.getElementById('palette-grid').innerHTML = html;
     }
-    window.jumpToQ=(idx)=>{ currentIdx=idx; loadQuestion(); togglePanel(false); };
+    
+    window.jumpToQ = (idx) => { 
+        currentIdx = idx; 
+        loadQuestion(); 
+        togglePanel(false); 
+    };
 
-    function loadQuestion(){ 
-        const q=activeExam.questions[currentIdx]; 
-        document.getElementById('q-text').innerText=`Q${currentIdx+1}. ${q.q}`; 
-        document.getElementById('q-topic-badge').innerText=q.topic||"General";
-        const img=document.getElementById('q-image');
-        if(q.image){ img.src=q.image; img.style.display='block'; } else { img.style.display='none'; }
-        let h=""; q.options.forEach(o=>{ h+=`<div onclick="selOpt('${o}')" class="option-btn ${userAnswers[currentIdx]===o?'selected':''}">${o}</div>`; }); 
-        document.getElementById('options-container').innerHTML=h; 
+    function loadQuestion() { 
+        const q = activeExam.questions[currentIdx]; 
+        
+        // প্রশ্ন টেক্সট সেট করুন (MathJax সাপোর্ট সহ)
+        document.getElementById('q-text').innerHTML = `Q${currentIdx+1}. ${q.q}`; 
+        document.getElementById('q-topic-badge').innerText = q.topic || "General";
+        
+        // ইমেজ
+        const img = document.getElementById('q-image');
+        if(q.image) { 
+            img.src = q.image; 
+            img.style.display = 'block'; 
+        } else { 
+            img.style.display = 'none'; 
+        }
+        
+        // অপশনগুলো
+        let h = ""; 
+        q.options.forEach(o => { 
+            h += `<div onclick="selOpt('${o}')" class="option-btn ${userAnswers[currentIdx] === o ? 'selected' : ''} math-content">${o}</div>`; 
+        }); 
+        document.getElementById('options-container').innerHTML = h; 
+        
+        // MathJax রেন্ডার করুন
+        setTimeout(renderMathJax, 100);
         updatePalette();
     }
-    function updatePalette(){
-        document.querySelectorAll('.palette-btn').forEach((b,i)=>{
-            b.className='palette-btn'; 
-            if(i===currentIdx) b.classList.add('active');
-            if(userAnswers[i]) b.classList.add('answered');
-            if(reviews[i]) b.classList.add('review');
+
+    // প্যালেট আপডেট ফাংশন
+    function updatePalette() {
+        document.querySelectorAll('.palette-btn').forEach((b,i) => {
+            let classes = "palette-btn";
+            if(i === currentIdx) classes += " active";
+            if(userAnswers[i] !== null && userAnswers[i] !== undefined) classes += " answered";
+            if(reviews[i]) classes += " review";
+            b.className = classes;
         });
     }
 
-    window.selOpt=(o)=>{ userAnswers[currentIdx]=o; loadQuestion(); };
-    window.markAndNext=()=>{ reviews[currentIdx]=true; window.nextQ(); };
-    window.clearResponse=()=>{ userAnswers[currentIdx]=null; reviews[currentIdx]=false; loadQuestion(); };
-    window.saveAndNext=()=>{ if(userAnswers[currentIdx]) reviews[currentIdx]=false; window.nextQ(); };
-    window.prevQ=()=>{ if(currentIdx > 0){ currentIdx--; loadQuestion(); } else { showPopup("Info","এটি প্রথম প্রশ্ন!","ℹ️"); } };
-    window.nextQ=()=>{ if(currentIdx<activeExam.questions.length-1){ currentIdx++; loadQuestion(); } else { showPopup("End","শেষ প্রশ্ন! সাবমিট করুন।","🏁", ()=>togglePanel(true)); } };
-    window.confirmSubmit=()=>{ showPopup("Submit?","আপনি কি নিশ্চিত?","🚀", window.submitExam); };
+    window.selOpt = (o) => { 
+        userAnswers[currentIdx] = o; 
+        loadQuestion(); 
+    };
+    
+    window.markAndNext = () => { 
+        reviews[currentIdx] = true; 
+        window.nextQ(); 
+    };
+    
+    window.clearResponse = () => { 
+        userAnswers[currentIdx] = null; 
+        reviews[currentIdx] = false; 
+        loadQuestion(); 
+    };
+    
+    window.saveAndNext = () => { 
+        if(userAnswers[currentIdx]) reviews[currentIdx] = false; 
+        window.nextQ(); 
+    };
+    
+    window.prevQ = () => { 
+        if(currentIdx > 0) { 
+            currentIdx--; 
+            loadQuestion(); 
+        } else { 
+            showPopup("Info", "এটি প্রথম প্রশ্ন!", "ℹ️"); 
+        } 
+    };
+    
+    window.nextQ = () => { 
+        if(currentIdx < activeExam.questions.length - 1) { 
+            currentIdx++; 
+            loadQuestion(); 
+        } else { 
+            showPopup("End", "শেষ প্রশ্ন! সাবমিট করুন।", "🏁", () => togglePanel(true)); 
+        } 
+    };
+    
+    window.confirmSubmit = () => { 
+        showPopup("Submit?", "আপনি কি নিশ্চিত?", "🚀", window.submitExam); 
+    };
 
-    function handleCheat(){
-        if(document.hidden){
+    function handleCheat() {
+        if(document.hidden) {
             cheatCount++;
             if(cheatCount >= 3) showPopup("Violation", "৩ বার ওয়ার্নিং শেষ! অটো সাবমিট।", "🚫", window.submitExam, true);
             else showPopup("Warning", `ট্যাব পরিবর্তন করবেন না! ওয়ার্নিং: ${cheatCount}/3`, "⚠️", null, true);
         }
     }
 
-    window.submitExam=async()=>{ 
-        togglePanel(false); disableProtect(); 
-        clearInterval(timerInterval); document.removeEventListener("visibilitychange", handleCheat); 
-        let score=0, correct=0, wrong=0;
-        let pos=activeExam.marking?activeExam.marking.correct:1, neg=activeExam.marking?activeExam.marking.wrong:0.25;
-        let topicStats={};
-        activeExam.questions.forEach((q,i)=>{ 
-            let t=q.topic||"Others"; if(!topicStats[t]) topicStats[t]={total:0,correct:0}; topicStats[t].total++;
-            if(userAnswers[i]===q.answer){ score+=parseFloat(pos); correct++; topicStats[t].correct++; }
-            else if(userAnswers[i]){ score-=parseFloat(neg); wrong++; }
+    window.submitExam = async() => { 
+        togglePanel(false); 
+        disableProtect(); 
+        clearInterval(timerInterval); 
+        document.removeEventListener("visibilitychange", handleCheat); 
+        
+        let score = 0, correct = 0, wrong = 0;
+        let pos = activeExam.marking ? activeExam.marking.correct : 1;
+        let neg = activeExam.marking ? activeExam.marking.wrong : 0.25;
+        let topicStats = {};
+        
+        activeExam.questions.forEach((q, i) => { 
+            let t = q.topic || "Others"; 
+            if(!topicStats[t]) topicStats[t] = { total: 0, correct: 0 }; 
+            topicStats[t].total++;
+            
+            if(userAnswers[i] === q.answer) { 
+                score += parseFloat(pos); 
+                correct++; 
+                topicStats[t].correct++; 
+            } else if(userAnswers[i]) { 
+                score -= parseFloat(neg); 
+                wrong++; 
+            }
         });
-        if(score<0) score=0;
-        let totalSec=activeExam.duration*60; let taken=totalSec-remainingSeconds;
-        let mm=Math.floor(taken/60), ss=taken%60;
-        let percent=(score/(activeExam.questions.length*pos))*100;
-        let th="";
-        for(let t in topicStats){
-            let p=(topicStats[t].correct/topicStats[t].total)*100;
-            let c=p>=80?'#00b894':(p>=40?'#fdcb6e':'#d63031');
-            th+=`<div style="margin-bottom:8px;"><div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;"><span>${t}</span><span>${Math.round(p)}%</span></div><div style="width:100%; background:#f1f2f6; height:6px; border-radius:10px;"><div style="height:100%; border-radius:10px; width:${p}%; background:${c};"></div></div></div>`;
+        
+        if(score < 0) score = 0;
+        
+        let totalSec = activeExam.duration * 60; 
+        let taken = totalSec - remainingSeconds;
+        let mm = Math.floor(taken / 60);
+        let ss = taken % 60;
+        let percent = (score / (activeExam.questions.length * pos)) * 100;
+        
+        let th = "";
+        for(let t in topicStats) {
+            let p = (topicStats[t].correct / topicStats[t].total) * 100;
+            let c = p >= 80 ? '#00b894' : (p >= 40 ? '#fdcb6e' : '#d63031');
+            th += `<div style="margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
+                    <span>${t}</span><span>${Math.round(p)}%</span>
+                </div>
+                <div style="width:100%; background:#f1f2f6; height:6px; border-radius:10px;">
+                    <div style="height:100%; border-radius:10px; width:${p}%; background:${c};"></div>
+                </div>
+            </div>`;
         }
+        
         window.switchView('result'); 
-        document.getElementById('res-score').innerText=score.toFixed(2); 
-        document.getElementById('res-percent').innerText=percent.toFixed(1)+"%"; 
-        document.getElementById('res-grade').innerText=percent>=80?"A+":percent>=60?"A":percent>=40?"B":"F";
-        document.getElementById('res-time').innerText=`${mm}m ${ss}s`;
-        document.getElementById('res-correct').innerText=correct;
-        document.getElementById('res-wrong').innerText=wrong;
-        document.getElementById('topic-analysis-container').innerHTML=th;
-        try{ confetti({particleCount:150,spread:70,origin:{y:0.6}}); }catch(e){}
-        try{ await addDoc(collection(db,"results"),{name:studentName, exam:activeExam.title, score:score.toFixed(2), percent:percent.toFixed(1), createdAt:Timestamp.now()}); }catch(e){}
+        document.getElementById('res-score').innerText = score.toFixed(2); 
+        document.getElementById('res-percent').innerText = percent.toFixed(1) + "%"; 
+        document.getElementById('res-grade').innerText = percent >= 80 ? "A+" : percent >= 60 ? "A" : percent >= 40 ? "B" : "F";
+        document.getElementById('res-time').innerText = `${mm}m ${ss}s`;
+        document.getElementById('res-correct').innerText = correct;
+        document.getElementById('res-wrong').innerText = wrong;
+        document.getElementById('topic-analysis-container').innerHTML = th;
+        
+        try { 
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); 
+        } catch(e) {}
+        
+        try { 
+            await addDoc(collection(db, "results"), {
+                name: studentName, 
+                exam: activeExam.title, 
+                examId: activeExam.id,
+                score: score.toFixed(2), 
+                percent: percent.toFixed(1), 
+                correct: correct,
+                wrong: wrong,
+                total: activeExam.questions.length,
+                createdAt: Timestamp.now()
+            }); 
+            
+            // Update exam stats
+            const examRef = doc(db, "exams", activeExam.id);
+            await updateDoc(examRef, {
+                attempts: increment(1)
+            });
+            
+        } catch(e) {
+            console.error("Error saving result:", e);
+        }
     };
 
-    function startTimer(s){ 
-        remainingSeconds=s; clearInterval(timerInterval); 
-        timerInterval=setInterval(()=>{ 
-            let m=Math.floor(remainingSeconds/60), sc=remainingSeconds%60; 
-            document.getElementById('timer').innerText=`${m}:${sc<10?'0':''}${sc}`; 
-            if(remainingSeconds--<=0){ clearInterval(timerInterval); showPopup("Time Up","সময় শেষ!","⌛", window.submitExam, true); } 
-        },1000); 
+    // টাইমার ফাংশন
+    function startTimer(s) { 
+        remainingSeconds = s; 
+        clearInterval(timerInterval); 
+        
+        // Immediate update
+        updateTimerDisplay();
+        
+        timerInterval = setInterval(() => { 
+            if (remainingSeconds <= 0) { 
+                clearInterval(timerInterval); 
+                showPopup("Time Up", "সময় শেষ!", "⌛", window.submitExam, true); 
+                return;
+            } 
+            remainingSeconds--;
+            updateTimerDisplay();
+        }, 1000); 
+        
+        function updateTimerDisplay() {
+            let m = Math.floor(remainingSeconds / 60);
+            let sc = remainingSeconds % 60;
+            document.getElementById('timer').innerText = `${m}:${sc < 10 ? '0' : ''}${sc}`;
+        }
     }
 
-    // Admin & Utils
-    window.checkAdmin=()=>{ if(document.getElementById('admin-pass').value===appSettings.teacherPass) window.switchView('admin-menu'); else showPopup("Error","ভুল পাসওয়ার্ড!","❌"); };
-    window.saveSettings=async()=>{ let t=document.getElementById('new-teacher-pass').value, r=document.getElementById('new-review-pass').value; if(t&&r){ appSettings={teacherPass:t, reviewPass:r}; await setDoc(doc(db,"settings","config"),appSettings); showPopup("Success","Saved!","✅",()=>window.switchView('admin-menu')); } };
+    // ================= ADMIN FUNCTIONS - SECURE =================
+
+    // Admin লগইন চেক
+    window.checkAdmin = async () => { 
+        const adminId = document.getElementById('admin-id').value.trim();
+        const adminPass = document.getElementById('admin-pass').value.trim();
+        
+        if(!adminId || !adminPass) {
+            showPopup("Error", "আইডি এবং পাসওয়ার্ড লিখুন!", "⚠️");
+            return;
+        }
+        
+        try {
+            // Load settings
+            const docRef = doc(db, "settings", "system");
+            const docSnap = await getDoc(docRef);
+            
+            if (!docSnap.exists()) {
+                showPopup("Error", "সিস্টেম কনফিগার করা হয়নি!", "❌");
+                return;
+            }
+            
+            const settings = docSnap.data();
+            const hashedInput = simpleHash(adminPass);
+            
+            // Check credentials
+            if(adminId === settings.adminId && hashedInput === settings.adminPass) {
+                // Login successful
+                currentAdmin = adminId;
+                
+                // Clear fields
+                document.getElementById('admin-id').value = "";
+                document.getElementById('admin-pass').value = "";
+                
+                // Update UI
+                document.getElementById('logged-admin').textContent = adminId;
+                
+                // Log the login
+                await addDoc(collection(db, "admin_logs"), {
+                    action: "ADMIN_LOGIN",
+                    adminId: adminId,
+                    timestamp: Timestamp.now(),
+                    ip: "web-app" // In real app, get user IP
+                });
+                
+                // Load admin menu
+                window.switchView('admin-menu');
+                loadSystemStats();
+                
+                showPopup("Success", "লগইন সফল!", "✅", null, true);
+            } else {
+                showPopup("Error", "ভুল আইডি বা পাসওয়ার্ড!", "❌");
+                
+                // Log failed attempt
+                await addDoc(collection(db, "failed_logins"), {
+                    attemptId: adminId,
+                    timestamp: Timestamp.now(),
+                    type: "ADMIN"
+                });
+            }
+        } catch(e) {
+            console.error("Login error:", e);
+            showPopup("Error", "লগইন করা যায়নি!", "❌");
+        }
+    };
+
+    // Admin logout
+    window.adminLogout = () => {
+        showPopup("Confirm", "লগআউট করবেন?", "🚪", () => {
+            currentAdmin = null;
+            window.switchView('dashboard');
+            showPopup("Success", "লগআউট সফল!", "✅", null, true);
+        });
+    };
+
+    // Change admin password from settings page
+    window.changeAdminPasswordFromSettings = async () => {
+        const newPass = document.getElementById('admin-new-password').value.trim();
+        const confirmPass = document.getElementById('admin-new-password-confirm').value.trim();
+        
+        if(!newPass || !confirmPass) {
+            showPopup("Error", "সব ফিল্ড পূরণ করুন!", "⚠️");
+            return;
+        }
+        
+        if(newPass.length < 6) {
+            showPopup("Error", "নতুন পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে!", "⚠️");
+            return;
+        }
+        
+        if(newPass !== confirmPass) {
+            showPopup("Error", "পাসওয়ার্ড মিলছে না!", "⚠️");
+            return;
+        }
+        
+        try {
+            const docRef = doc(db, "settings", "system");
+            
+            // Update password
+            const hashedNew = simpleHash(newPass);
+            await updateDoc(docRef, {
+                adminPass: hashedNew,
+                updatedAt: Timestamp.now(),
+                lastPasswordChange: Timestamp.now()
+            });
+            
+            // Clear fields
+            document.getElementById('admin-new-password').value = "";
+            document.getElementById('admin-new-password-confirm').value = "";
+            
+            // Log the change
+            await addDoc(collection(db, "admin_logs"), {
+                action: "ADMIN_PASSWORD_CHANGE_FROM_SETTINGS",
+                adminId: currentAdmin,
+                timestamp: Timestamp.now()
+            });
+            
+            showPopup("Success", "এডমিন পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!", "✅");
+            
+        } catch(e) {
+            console.error("Admin password change error:", e);
+            showPopup("Error", "পাসওয়ার্ড পরিবর্তন করা যায়নি!", "❌");
+        }
+    };
+
+    // Change review password
+    window.changeReviewPassword = async () => {
+        const newPass = document.getElementById('review-new-password').value.trim();
+        const confirmPass = document.getElementById('review-new-password-confirm').value.trim();
+        
+        if(!newPass || !confirmPass) {
+            showPopup("Error", "সব ফিল্ড পূরণ করুন!", "⚠️");
+            return;
+        }
+        
+        if(newPass !== confirmPass) {
+            showPopup("Error", "পাসওয়ার্ড মিলছে না!", "⚠️");
+            return;
+        }
+        
+        try {
+            const docRef = doc(db, "settings", "system");
+            
+            // Update password
+            const hashedNew = simpleHash(newPass);
+            await updateDoc(docRef, {
+                reviewPass: hashedNew,
+                updatedAt: Timestamp.now(),
+                lastReviewPasswordChange: Timestamp.now()
+            });
+            
+            // Clear fields
+            document.getElementById('review-new-password').value = "";
+            document.getElementById('review-new-password-confirm').value = "";
+            
+            // Log the change
+            await addDoc(collection(db, "admin_logs"), {
+                action: "REVIEW_PASSWORD_CHANGE",
+                adminId: currentAdmin,
+                timestamp: Timestamp.now()
+            });
+            
+            showPopup("Success", "রিভিউ পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!", "✅");
+            
+        } catch(e) {
+            console.error("Review password change error:", e);
+            showPopup("Error", "পাসওয়ার্ড পরিবর্তন করা যায়নি!", "❌");
+        }
+    };
+
+    // Change admin password from dedicated page
+    window.changeAdminPassword = async () => {
+        const currentPass = document.getElementById('current-password').value.trim();
+        const newPass = document.getElementById('new-password').value.trim();
+        const confirmPass = document.getElementById('confirm-password').value.trim();
+        
+        if(!currentPass || !newPass || !confirmPass) {
+            showPopup("Error", "সব ফিল্ড পূরণ করুন!", "⚠️");
+            return;
+        }
+        
+        if(newPass.length < 6) {
+            showPopup("Error", "নতুন পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে!", "⚠️");
+            return;
+        }
+        
+        if(newPass !== confirmPass) {
+            showPopup("Error", "নতুন পাসওয়ার্ড মিলছে না!", "⚠️");
+            return;
+        }
+        
+        try {
+            // Load current settings
+            const docRef = doc(db, "settings", "system");
+            const docSnap = await getDoc(docRef);
+            
+            if (!docSnap.exists()) {
+                showPopup("Error", "সিস্টেম সেটিংস পাওয়া যায়নি!", "❌");
+                return;
+            }
+            
+            const settings = docSnap.data();
+            const hashedCurrent = simpleHash(currentPass);
+            
+            // Verify current password
+            if(hashedCurrent !== settings.adminPass) {
+                showPopup("Error", "বর্তমান পাসওয়ার্ড ভুল!", "❌");
+                return;
+            }
+            
+            // Update password
+            const hashedNew = simpleHash(newPass);
+            await updateDoc(docRef, {
+                adminPass: hashedNew,
+                updatedAt: Timestamp.now(),
+                lastPasswordChange: Timestamp.now()
+            });
+            
+            // Clear fields
+            document.getElementById('current-password').value = "";
+            document.getElementById('new-password').value = "";
+            document.getElementById('confirm-password').value = "";
+            
+            // Log the change
+            await addDoc(collection(db, "admin_logs"), {
+                action: "PASSWORD_CHANGE",
+                adminId: currentAdmin,
+                timestamp: Timestamp.now()
+            });
+            
+            showPopup("Success", "পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!", "✅", () => {
+                window.switchView('admin-menu');
+            });
+            
+        } catch(e) {
+            console.error("Password change error:", e);
+            showPopup("Error", "পাসওয়ার্ড পরিবর্তন করা যায়নি!", "❌");
+        }
+    };
+
+    // Load settings to form
+    async function loadSettingsToForm() {
+        try {
+            const docRef = doc(db, "settings", "system");
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                const settings = docSnap.data();
+                
+                // Fill form fields
+                document.getElementById('system-name').value = settings.systemName || "Mr. Stylo Academy";
+                document.getElementById('default-exam-time').value = settings.defaultExamTime || 30;
+                document.getElementById('default-positive-mark').value = settings.defaultPositiveMark || 1;
+                document.getElementById('default-negative-mark').value = settings.defaultNegativeMark || 0.25;
+            }
+        } catch(e) {
+            console.error("Error loading settings:", e);
+        }
+    }
+
+    // Save system settings
+    window.saveSystemSettings = async () => {
+        try {
+            const docRef = doc(db, "settings", "system");
+            const systemName = document.getElementById('system-name').value.trim() || "Mr. Stylo Academy";
+            const defaultTime = parseInt(document.getElementById('default-exam-time').value) || 30;
+            const defaultPos = parseFloat(document.getElementById('default-positive-mark').value) || 1;
+            const defaultNeg = parseFloat(document.getElementById('default-negative-mark').value) || 0.25;
+            
+            await updateDoc(docRef, {
+                systemName: systemName,
+                defaultExamTime: defaultTime,
+                defaultPositiveMark: defaultPos,
+                defaultNegativeMark: defaultNeg,
+                updatedAt: Timestamp.now()
+            });
+            
+            showPopup("Success", "সেটিংস সফলভাবে সেভ হয়েছে!", "✅", () => {
+                window.switchView('admin-menu');
+            });
+            
+        } catch(e) {
+            console.error("Settings save error:", e);
+            showPopup("Error", "সেটিংস সেভ করা যায়নি!", "❌");
+        }
+    };
+
+    // Review পাসওয়ার্ড চেক
+    window.checkReviewPass = async () => { 
+        const reviewPass = document.getElementById('review-pass').value.trim();
+        if(!reviewPass) {
+            showPopup("Error", "পাসওয়ার্ড লিখুন!", "⚠️");
+            return;
+        }
+        
+        try {
+            const docRef = doc(db, "settings", "system");
+            const docSnap = await getDoc(docRef);
+            
+            if (!docSnap.exists()) {
+                showPopup("Error", "সিস্টেম সেটিংস পাওয়া যায়নি!", "❌");
+                return;
+            }
+            
+            const settings = docSnap.data();
+            const hashedInput = simpleHash(reviewPass);
+            
+            if(hashedInput === settings.reviewPass) {
+                document.getElementById('review-pass').value = "";
+                window.showReview();
+            } else {
+                showPopup("Error", "ভুল পাসওয়ার্ড!", "❌");
+            }
+        } catch(e) {
+            console.error("Review pass check error:", e);
+            showPopup("Error", "পাসওয়ার্ড চেক করা যায়নি!", "❌");
+        }
+    };
+
+    // ================= OTHER ADMIN FUNCTIONS =================
     
-    window.toggleInputMode=(m)=>{ inputMode=m; document.getElementById('mode-json').classList.toggle('hidden',m!=='json'); document.getElementById('mode-manual').classList.toggle('hidden',m!=='manual'); if(m==='manual' && document.getElementById('questions-wrapper').children.length===0) window.addQuestionField(); };
-    window.addQuestionField=()=>{
-        const id=Date.now();
-        const h=`<div class="exam-card" id="q-${id}" style="background:#f9f9f9; padding:10px; border:1px solid #ddd; margin-bottom:10px; border-radius:8px;">
+    window.toggleInputMode = (m) => { 
+        inputMode = m; 
+        document.getElementById('mode-json').classList.toggle('hidden', m !== 'json'); 
+        document.getElementById('mode-manual').classList.toggle('hidden', m !== 'manual'); 
+        if(m === 'manual' && document.getElementById('questions-wrapper').children.length === 0) 
+            window.addQuestionField(); 
+    };
+    
+    window.addQuestionField = () => {
+        const id = Date.now();
+        const h = `<div class="exam-card" id="q-${id}" style="background:#f9f9f9; padding:10px; border:1px solid #ddd; margin-bottom:10px; border-radius:8px;">
             <input type="text" class="inp-q" placeholder="Question..." style="margin-bottom:5px; width:100%; padding:8px;">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;"><input type="text" class="inp-topic" placeholder="Topic"><input type="text" class="inp-img" placeholder="Img URL"></div>
-            <div id="opts-${id}">${getOpt(id,1)}${getOpt(id,2)}${getOpt(id,3)}${getOpt(id,4)}</div>
-            <textarea class="inp-exp" placeholder="ব্যাখ্যা (Explanation)..." style="width:100%; height:50px; padding:8px; border:1px solid #ddd; border-radius:5px; margin-top:5px;"></textarea>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:5px;">
+                <input type="text" class="inp-topic" placeholder="Topic">
+                <input type="text" class="inp-img" placeholder="Img URL">
+            </div>
+            <div id="opts-${id}">
+                ${getOpt(id,1)}
+                ${getOpt(id,2)}
+                ${getOpt(id,3)}
+                ${getOpt(id,4)}
+            </div>
+            <!-- Explanation field -->
+            <textarea class="inp-exp" placeholder="ব্যাখ্যা (Explanation) - MathJax সাপোর্টেড: $E=mc^2$..." 
+                      style="width:100%; height:60px; padding:8px; border:1px solid #ddd; border-radius:5px; margin-top:5px; font-size:0.9rem;"></textarea>
             <button onclick="document.getElementById('q-${id}').remove()" class="btn btn-danger" style="padding:5px; width:auto; font-size:0.8rem; margin-top:5px;">Delete</button>
         </div>`;
         document.getElementById('questions-wrapper').insertAdjacentHTML('beforeend', h);
     };
-    function getOpt(id,n){ return `<div style="display:flex; gap:5px; margin-bottom:5px;"><input type="radio" name="ans-${id}" value="${n-1}"><input type="text" class="inp-opt" placeholder="Op ${n}" style="padding:8px;"></div>`; }
+    
+    function getOpt(id, n) { 
+        return `<div style="display:flex; gap:5px; margin-bottom:5px;">
+            <input type="radio" name="ans-${id}" value="${n-1}">
+            <input type="text" class="inp-opt" placeholder="Option ${n}" style="padding:8px;">
+        </div>`; 
+    }
 
-    document.getElementById('btn-publish').addEventListener('click', async()=>{
-        const t=document.getElementById('new-title').value; 
-        const cat = document.getElementById('new-category').value; 
-        let q=[];
+    document.getElementById('btn-publish').addEventListener('click', async () => {
+        if (!currentAdmin) {
+            showPopup("Error", "লগইন প্রয়োজন!", "🔒");
+            window.switchView('admin-login');
+            return;
+        }
         
-        if(inputMode==='json'){ try{ let j=JSON.parse(document.getElementById('json-input').value); q=Array.isArray(j)?j:(j.questions||[]); }catch(e){ return showPopup("Error","JSON Error","⚠️"); } }
-        else {
-            document.querySelectorAll('#questions-wrapper .exam-card').forEach(c=>{
-                let qt=c.querySelector('.inp-q').value, ops=[], ans=null;
-                c.querySelectorAll('.inp-opt').forEach((o,i)=>{ if(o.value){ ops.push(o.value); if(o.parentElement.querySelector('input[type="radio"]').checked) ans=o.value; } });
-                let exp = c.querySelector('.inp-exp').value || null;
-                if(qt && ops.length>1 && ans) q.push({q:qt, options:ops, answer:ans, topic:c.querySelector('.inp-topic').value||"Gen", image:c.querySelector('.inp-img').value||null, explanation:exp});
+        const t = document.getElementById('new-title').value.trim(); 
+        const cat = document.getElementById('new-category').value; 
+        let q = [];
+        
+        if(inputMode === 'json') { 
+            try { 
+                let j = JSON.parse(document.getElementById('json-input').value); 
+                q = Array.isArray(j) ? j : (j.questions || []); 
+            } catch(e) { 
+                return showPopup("Error", "JSON ফরম্যাট ভুল!", "⚠️"); 
+            } 
+        } else {
+            document.querySelectorAll('#questions-wrapper .exam-card').forEach(c => {
+                let qt = c.querySelector('.inp-q').value.trim();
+                let ops = [];
+                let ans = null;
+                
+                c.querySelectorAll('.inp-opt').forEach((o, i) => { 
+                    if(o.value.trim()) { 
+                        ops.push(o.value.trim()); 
+                        if(o.parentElement.querySelector('input[type="radio"]').checked) 
+                            ans = o.value.trim(); 
+                    } 
+                });
+                
+                let exp = c.querySelector('.inp-exp').value.trim() || null;
+                
+                if(qt && ops.length > 1 && ans) {
+                    q.push({
+                        q: qt, 
+                        options: ops, 
+                        answer: ans, 
+                        topic: c.querySelector('.inp-topic').value.trim() || "General", 
+                        image: c.querySelector('.inp-img').value.trim() || null, 
+                        explanation: exp
+                    });
+                }
             });
         }
-        if(!t || q.length===0) return showPopup("Error","তথ্য দিন!","⚠️");
+        
+        if(!t || q.length === 0) return showPopup("Error", "পরীক্ষার নাম এবং অন্তত একটি প্রশ্ন দিন!", "⚠️");
         
         const payload = {
-            title:t, duration:document.getElementById('new-time').value, category: cat, questions:q, 
-            marking:{ correct:document.getElementById('mark-correct').value, wrong:document.getElementById('mark-wrong').value }, 
-            createdAt:Timestamp.now()
+            title: t, 
+            duration: parseInt(document.getElementById('new-time').value) || 30, 
+            category: cat, 
+            questions: q, 
+            marking: { 
+                correct: parseFloat(document.getElementById('mark-correct').value) || 1, 
+                wrong: parseFloat(document.getElementById('mark-wrong').value) || 0.25 
+            }, 
+            createdBy: currentAdmin,
+            attempts: 0,
+            createdAt: Timestamp.now()
         };
 
-        try{ 
+        try { 
             if(editingExamId) {
                 await setDoc(doc(db, "exams", editingExamId), payload);
-                showPopup("Success", "Updated!", "✅", () => { editingExamId = null; window.switchView('admin-menu'); });
+                showPopup("Success", "পরীক্ষা আপডেট হয়েছে!", "✅", () => { 
+                    editingExamId = null; 
+                    window.switchView('admin-menu'); 
+                });
             } else {
                 await addDoc(collection(db, "exams"), payload); 
-                showPopup("Success", "Published!", "✅", () => window.switchView('admin-menu')); 
+                showPopup("Success", "পরীক্ষা প্রকাশিত হয়েছে!", "✅", () => window.switchView('admin-menu')); 
             }
-        } catch(e) { showPopup("Error", "Failed!", "❌"); }
+        } catch(e) { 
+            console.error("Error publishing exam:", e);
+            showPopup("Error", "পরীক্ষা প্রকাশ করা যায়নি!", "❌"); 
+        }
     });
 
     window.editExam = async (id) => {
+        if (!currentAdmin) {
+            showPopup("Error", "লগইন প্রয়োজন!", "🔒");
+            window.switchView('admin-login');
+            return;
+        }
+        
         showPopup("Loading", "লোড হচ্ছে...", "⏳", null, true);
         try {
             const docSnap = await getDoc(doc(db, "exams", id));
-            if(docSnap.exists()){
+            if(docSnap.exists()) {
                 const d = docSnap.data();
                 editingExamId = id;
                 document.getElementById('new-title').value = d.title;
                 document.getElementById('new-time').value = d.duration;
                 document.getElementById('new-category').value = d.category || 'General';
-                if(d.marking){ document.getElementById('mark-correct').value = d.marking.correct; document.getElementById('mark-wrong').value = d.marking.wrong; }
+                
+                if(d.marking) { 
+                    document.getElementById('mark-correct').value = d.marking.correct; 
+                    document.getElementById('mark-wrong').value = d.marking.wrong; 
+                }
+                
                 window.toggleInputMode('json');
                 document.getElementById('json-input').value = JSON.stringify(d.questions, null, 4);
+                
                 const btn = document.getElementById('btn-publish');
                 btn.innerText = "🔄 UPDATE EXAM";
                 btn.classList.remove('btn-success');
                 btn.classList.add('btn-save');
+                
                 document.getElementById('custom-popup').classList.add('hidden');
                 window.switchView('create-exam');
             }
-        } catch(e) { showPopup("Error", "Load Error", "❌"); }
+        } catch(e) { 
+            showPopup("Error", "লোড করা যায়নি!", "❌"); 
+        }
     };
 
-    window.loadManageExams=async()=>{ 
-        window.switchView('manage-exams'); document.getElementById('manage-exam-list').innerHTML="Loading..."; 
-        const s=await getDocs(query(collection(db,"exams"),orderBy("createdAt","desc"))); 
-        let h=""; s.forEach(d=>{
-            h+=`<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; gap:10px;">
-                <span style="flex:1;">${d.data().title} <small style="color:#666">(${d.data().category||'Gen'})</small></span>
-                <button onclick="editExam('${d.id}')" class="btn btn-primary" style="width:auto; padding:5px 12px; margin:0; font-size:0.8rem;">Edit</button>
-                <button onclick="delExam('${d.id}')" class="btn btn-danger" style="width:auto; padding:5px 12px; margin:0; font-size:0.8rem;">Del</button>
-            </div>`;
+    window.loadManageExams = async () => { 
+        if (!currentAdmin) {
+            showPopup("Error", "লগইন প্রয়োজন!", "🔒");
+            window.switchView('admin-login');
+            return;
+        }
+        
+        window.switchView('manage-exams'); 
+        document.getElementById('manage-exam-list').innerHTML = "Loading..."; 
+        try {
+            const s = await getDocs(query(collection(db, "exams"), orderBy("createdAt", "desc"))); 
+            let h = ""; 
+            s.forEach(d => {
+                const data = d.data();
+                h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; gap:10px;">
+                    <span style="flex:1;">${data.title} <small style="color:#666">(${data.category || 'Gen'})</small></span>
+                    <span style="font-size:0.8rem; color:#666;">${data.attempts || 0} attempts</span>
+                    <button onclick="editExam('${d.id}')" class="btn btn-primary" style="width:auto; padding:5px 12px; margin:0; font-size:0.8rem;">Edit</button>
+                    <button onclick="delExam('${d.id}')" class="btn btn-danger" style="width:auto; padding:5px 12px; margin:0; font-size:0.8rem;">Del</button>
+                </div>`;
+            }); 
+            document.getElementById('manage-exam-list').innerHTML = h || "No Exams"; 
+        } catch(e) {
+            document.getElementById('manage-exam-list').innerHTML = "Error loading exams.";
+        }
+    };
+
+    window.delExam = (id) => { 
+        if (!currentAdmin) {
+            showPopup("Error", "লগইন প্রয়োজন!", "🔒");
+            window.switchView('admin-login');
+            return;
+        }
+        
+        showPopup("Delete?", "এই পরীক্ষা মুছবেন?", "🗑️", async () => { 
+            try {
+                await deleteDoc(doc(db, "exams", id)); 
+                loadManageExams();
+                showPopup("Success", "পরীক্ষা মুছে ফেলা হয়েছে!", "✅");
+            } catch(e) {
+                showPopup("Error", "মুছতে সমস্যা হয়েছে!", "❌");
+            }
         }); 
-        document.getElementById('manage-exam-list').innerHTML=h||"No Exams"; 
     };
 
-    window.delExam=(id)=>{ showPopup("Delete?","মুছবেন?","🗑️",async()=>{ await deleteDoc(doc(db,"exams",id)); loadManageExams(); }); };
-    window.checkReviewPass=()=>{ if(document.getElementById('review-pass').value===appSettings.reviewPass) window.showReview(); else showPopup("Error","ভুল পাসওয়ার্ড!","❌"); };
-    window.showReview=()=>{ 
-        let h=""; document.getElementById('review-student-name').innerText=studentName; 
-        activeExam.questions.forEach((q,i)=>{ 
-            let s=(userAnswers[i]===q.answer)?"correct":(userAnswers[i]?"wrong":"skipped");
-            let c=s==="correct"?"#00b894":(s==="wrong"?"#d63031":"#636e72");
-            h+=`<div class="review-item ${s}" style="background:white; padding:15px; margin-bottom:10px; border-left:4px solid ${c}; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+    window.showReview = () => { 
+        let h = ""; 
+        document.getElementById('review-student-name').innerText = studentName; 
+        
+        activeExam.questions.forEach((q, i) => { 
+            let s = (userAnswers[i] === q.answer) ? "correct" : (userAnswers[i] ? "wrong" : "skipped");
+            let c = s === "correct" ? "#00b894" : (s === "wrong" ? "#d63031" : "#636e72");
+            
+            h += `<div class="review-item ${s}" style="background:white; padding:15px; margin-bottom:10px; border-left:4px solid ${c}; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
                 <p style="margin:0 0 5px 0;"><b>Q${i+1}. ${q.q}</b></p>
-                <p style="font-size:0.85rem; color:#666;">You: <b style="color:${c}">${userAnswers[i]||'Skipped'}</b> | Ans: <b style="color:#00b894">${q.answer}</b></p>
-                <div style="background:#f1f2f6; padding:8px; font-size:0.85rem; margin-top:5px; border-radius:5px;">💡 ${q.explanation || 'No Explanation'}</div>
+                <div style="margin:10px 0; padding:10px; background:#f8f9fa; border-radius:5px;">
+                    <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:5px;">
+                        ${q.options.map((opt, idx) => `
+                            <div style="padding:5px; border-radius:3px; background:${opt === q.answer ? '#d4edda' : (userAnswers[i] === opt ? '#f8d7da' : '#f1f2f6')}">
+                                ${String.fromCharCode(65 + idx)}. ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <p style="font-size:0.85rem; color:#666;">আপনার উত্তর: <b style="color:${c}">${userAnswers[i] || 'Skipped'}</b> | সঠিক উত্তর: <b style="color:#00b894">${q.answer}</b></p>
+                <div style="background:#eef2ff; padding:10px; font-size:0.85rem; margin-top:8px; border-radius:5px; border-left:3px solid #6c5ce7;">
+                    <strong style="color:#6c5ce7;">💡 ব্যাখ্যা:</strong><br>
+                    <div class="math-content">${q.explanation || 'এই প্রশ্নের জন্য কোন ব্যাখ্যা নেই।'}</div>
+                </div>
             </div>`; 
-        }); document.getElementById('review-list').innerHTML=h; window.switchView('review'); 
+        }); 
+        
+        document.getElementById('review-list').innerHTML = h; 
+        window.switchView('review'); 
+        
+        // MathJax রেন্ডার করুন
+        setTimeout(renderMathJax, 300);
     };
-    window.filterReview=(t)=>{ document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); document.querySelectorAll('.review-item').forEach(i=>{ i.style.display=(t==='all'||i.classList.contains(t))?'block':'none'; }); };
-    window.loadAdminResults=async()=>{ window.switchView('admin-results'); document.getElementById('result-table-body').innerHTML="Loading..."; const s=await getDocs(query(collection(db,"results"),orderBy("createdAt","desc"))); let h=""; s.forEach(d=>{let v=d.data(); h+=`<tr style="border-bottom:1px solid #eee;"><td>${v.name}</td><td>${v.exam}</td><td>${v.score}</td></tr>`;}); document.getElementById('result-table-body').innerHTML=h||"<tr><td>No Data</td></tr>"; };
-    window.loadLeaderboard=async()=>{ window.switchView('leaderboard'); document.getElementById('lb-exam-name').innerText=activeExam.title; document.getElementById('lb-list').innerHTML="Loading..."; const s=await getDocs(query(collection(db,"results"),orderBy("score","desc"))); let h="<table style='width:100%; font-size:0.9rem;'><tr><th>Rank</th><th>Name</th><th>Score</th></tr>", r=1; s.forEach(d=>{let v=d.data(); if(v.exam===activeExam.title){ h+=`<tr><td style="text-align:center;">${r}</td><td>${v.name}</td><td style="text-align:center; font-weight:bold;">${v.score}</td></tr>`; r++; } }); document.getElementById('lb-list').innerHTML=r>1?h+"</table>":"No Data"; };
-    window.shareExam=()=>{ if(navigator.share) navigator.share({title:activeExam.title, text:`Scored ${document.getElementById('res-score').innerText} in ${activeExam.title}!`, url:window.location.href}); else alert("Copied!"); };
+    
+    window.filterReview = (t) => { 
+        document.querySelectorAll('.review-item').forEach(i => { 
+            i.style.display = (t === 'all' || i.classList.contains(t)) ? 'block' : 'none'; 
+        }); 
+    };
+    
+    // ================= ADMIN RESULTS WITH PAGINATION =================
+    
+    window.loadAdminResults = async () => { 
+        if (!currentAdmin) {
+            showPopup("Error", "লগইন প্রয়োজন!", "🔒");
+            window.switchView('admin-login');
+            return;
+        }
+        
+        window.switchView('admin-results'); 
+        document.getElementById('result-table-body').innerHTML = "Loading..."; 
+        document.getElementById('result-pagination').classList.add('hidden');
+        
+        try {
+            const s = await getDocs(query(collection(db, "results"), orderBy("createdAt", "desc"))); 
+            allResultsData = [];
+            s.forEach(d => {
+                allResultsData.push({...d.data(), id: d.id});
+            });
+            
+            // Reset to page 1
+            currentResultsPage = 1;
+            renderResultsList();
+        } catch(e) {
+            document.getElementById('result-table-body').innerHTML = "<tr><td colspan='5'>Error loading results</td></tr>";
+        }
+    };
+
+    function renderResultsList() {
+        const tbody = document.getElementById('result-table-body');
+        const pControls = document.getElementById('result-pagination');
+        
+        if (allResultsData.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='5'>No Data</td></tr>";
+            pControls.classList.add('hidden');
+            return;
+        }
+
+        // Pagination Logic
+        const startIndex = (currentResultsPage - 1) * resultsPerPage;
+        const endIndex = startIndex + resultsPerPage;
+        const pageItems = allResultsData.slice(startIndex, endIndex);
+        const totalPages = Math.ceil(allResultsData.length / resultsPerPage);
+
+        let h = ""; 
+        pageItems.forEach((v) => {
+            h += `<tr style="border-bottom:1px solid #eee;">
+                <td>${v.name}</td>
+                <td>${v.exam}</td>
+                <td>${v.score}</td>
+                <td>${v.percent}%</td>
+                <td>${v.correct}/${v.total}</td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = h;
+
+        // Update Pagination Controls
+        if (totalPages > 1) {
+            pControls.classList.remove('hidden');
+            document.getElementById('results-page-info').innerText = `Page ${currentResultsPage} of ${totalPages}`;
+            document.getElementById('btn-results-prev').disabled = (currentResultsPage === 1);
+            document.getElementById('btn-results-next').disabled = (currentResultsPage === totalPages);
+        } else {
+            pControls.classList.add('hidden');
+        }
+    }
+
+    window.changeResultPage = (dir) => {
+        currentResultsPage += dir;
+        renderResultsList();
+    };
+    
+    window.loadLeaderboard = async () => { 
+        window.switchView('leaderboard'); 
+        document.getElementById('lb-exam-name').innerText = activeExam.title; 
+        document.getElementById('lb-list').innerHTML = "Loading..."; 
+        try {
+            const s = await getDocs(query(collection(db, "results"), orderBy("score", "desc"))); 
+            let h = "<table style='width:100%; font-size:0.9rem; border-collapse:collapse;'><tr style='background:#f8f9fa;'><th style='padding:10px; text-align:center;'>Rank</th><th style='padding:10px;'>Name</th><th style='padding:10px; text-align:center;'>Score</th><th style='padding:10px; text-align:center;'>%</th></tr>"; 
+            let r = 1; 
+            s.forEach(d => {
+                let v = d.data(); 
+                if(v.examId === activeExam.id) { 
+                    h += `<tr style='border-bottom:1px solid #eee;'>
+                        <td style="text-align:center; padding:8px;">${r}</td>
+                        <td style="padding:8px;">${v.name}</td>
+                        <td style="text-align:center; padding:8px; font-weight:bold; color:#6c5ce7;">${v.score}</td>
+                        <td style="text-align:center; padding:8px;">${v.percent}%</td>
+                    </tr>`; 
+                    r++; 
+                } 
+            }); 
+            document.getElementById('lb-list').innerHTML = r > 1 ? h + "</table>" : "<p style='text-align:center;'>No data available</p>"; 
+        } catch(e) {
+            document.getElementById('lb-list').innerHTML = "<p style='text-align:center;'>Error loading leaderboard</p>";
+        }
+    };
+    
+    window.shareExam = () => { 
+        if(navigator.share) {
+            navigator.share({
+                title: activeExam.title, 
+                text: `Scored ${document.getElementById('res-score').innerText} in ${activeExam.title}!`, 
+                url: window.location.href
+            });
+        } else {
+            navigator.clipboard.writeText(`Scored ${document.getElementById('res-score').innerText} in ${activeExam.title}!`);
+            alert("Result copied to clipboard!");
+        }
+    };
 
 </script>
 </body>
